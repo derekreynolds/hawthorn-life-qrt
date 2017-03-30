@@ -19,6 +19,8 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
+import com.hawthornlife.qrt.domain.Fund;
+
 /**
  * @author Derek Reynolds
  *
@@ -26,6 +28,8 @@ import org.xml.sax.SAXException;
 public class FileProcessor {
 
 	private static Logger log = LoggerFactory.getLogger(FileProcessor.class);
+	
+	private FundService fundService = new FundService();
 	
 	public void process(final File file) {
 		
@@ -37,8 +41,9 @@ public class FileProcessor {
 		try {
 			dBuilder = dbFactory.newDocumentBuilder();
 		
-			Document doc = dBuilder.parse(file);
+			Document document = dBuilder.parse(file);
 			
+			Fund fund = fundService.build(document);
 			
 		} catch (ParserConfigurationException | SAXException | IOException e) {
 			log.error("Error processing file {}", file.getAbsoluteFile());
