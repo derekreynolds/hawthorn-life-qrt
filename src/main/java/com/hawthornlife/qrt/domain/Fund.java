@@ -3,8 +3,11 @@
  */
 package com.hawthornlife.qrt.domain;
 
+
 import java.util.SortedMap;
 import java.util.TreeMap;
+
+import org.w3c.dom.Document;
 
 import lombok.Data;
 
@@ -18,7 +21,11 @@ import lombok.Data;
 
 public @Data class Fund {
 
+	private Document document;
+	
 	private String name;
+	
+	private String legalName;
 	
 	private String isin;
 	
@@ -26,12 +33,9 @@ public @Data class Fund {
 	
 	private String country;
 	
-	private Double assetUnderManagement;
+	private Double assetUnderManagement = 0.0;
 
-	private SortedMap<String, FundHolding> fundHoldings = new TreeMap<>();
+	private SortedMap<Integer, FundHolding> fundHoldings = new TreeMap<>();
 	
-	
-	public void add(String isin, FundHolding fundHolding) {
-		fundHoldings.put(isin, fundHolding);
-	}
+
 }

@@ -32,7 +32,9 @@ public class QrtApplication extends Application {
     
     @Override
     public void start(Stage stage) throws Exception {
+    	
     	Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fx/QrtApplication.fxml"));
+    	
     	stage.setTitle("Hawthorn Life QRT");
     	
     	stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/favicon.ico")));
@@ -41,7 +43,10 @@ public class QrtApplication extends Application {
     	stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/favicon-96x96.png")));
     	stage.getIcons().add(new Image(getClass().getClassLoader().getResourceAsStream("images/hawthorn-life-logo.png")));
     	
+    	stage.setMaximized(true);
+    	
     	stage.setScene(new Scene(root));
+    	
     	stage.show();
     }
     

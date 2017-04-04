@@ -4,19 +4,23 @@ import lombok.Data;
 
 public @Data class FundHolding {
 
-	private String name;
+	private Integer id;
 	
-	private String isin;
+	private String externalId;
+	
+	private String name;	
 	
 	private String countryCode;
 	
 	private String country;
 	
-	private String localCountry;
-	
+	private String localCurrencyCode;
+		
 	private String assetClass;
+	
+	private Double marketValue;
 	
 	private Double weighting;
 	
-	private Double marketValue;
+	private Double adjustedWeighting;
 }
