@@ -5,6 +5,8 @@ package com.hawthornlife.qrt.service;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -13,9 +15,12 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.codehaus.plexus.util.FileUtils;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.domain.FundHolding;
@@ -42,16 +47,24 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	@Override
 	public void generate() {
 		
-		log.info("Generating Investment Report");
+		log.debug("Entering");
 		
 		createAumSheet();
 	     
-		FileOutputStream out = new FileOutputStream(new File("Hawthorn-Life-QRT.xlsx"));
+		LocalDateTime now = LocalDateTime.now();
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_km");
+		String text = now.format(formatter);
+		
+		FileUtils.forceMkdir(new File(text));
+		
+		FileOutputStream out = new FileOutputStream(new File(text + "/Hawthorn-Life-QRT.xlsx"));
 		workbook.write(out);
 		out.close();
 	}
 	
 	private void createAumSheet() {
+		
+		log.debug("Entering");
 		
 		int rowIndex = 0;
 		
@@ -74,7 +87,7 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 			XSSFRow r = spreadsheet.createRow(++rowIndex);
 			 
 			r.createCell(0).setCellValue(fund.getIsin());
-			r.createCell(1).setCellValue(fund.getLegalName());
+			r.createCell(1).setCellValue(fund.getLegalName());			
 			r.createCell(2).setCellValue(Double.valueOf(fund.getAssetUnderManagement()));
 			
 			createFundHoldingSheet(fund);	
@@ -85,6 +98,8 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	}
 
 	private void createAssetClassSheet(final Fund fund) {
+		
+		log.debug("Entering with {}", fund.getLegalName());
 		
 		XSSFSheet spreadsheet = workbook.createSheet(fund.getIsin() + " - Asset Class");
 
@@ -104,8 +119,10 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 			
 			XSSFRow row = spreadsheet.createRow(++rowIndex);
 			
-			for(String k: key.split(":")) {
-				row.createCell(columnIndex++).setCellValue(k);				
+			row.createCell(columnIndex++).setCellValue(fund.getIsin());
+			
+			for(String keyPart: key.split(":")) {
+				createPossibleCell(row, columnIndex++, keyPart);				
 			}
 			
 			double summedAdjustedWeight = assetClassAggregation.get(key)
@@ -120,10 +137,13 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	
 	private void addAssetClassHeader(XSSFSheet spreadsheet) {
 		
+		log.debug("Entering");
+		
 		XSSFRow row = spreadsheet.createRow(0);
 		
 		int columnIndex = 0;
 		
+		row.createCell(columnIndex++).setCellValue("ISIN");
 		row.createCell(columnIndex++).setCellValue("Asset Class Code");
 		row.createCell(columnIndex++).setCellValue("Country Code");
 		row.createCell(columnIndex++).setCellValue("Currency Code");
@@ -133,6 +153,8 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	}
 
 	private void createFundHoldingSheet(final Fund fund) {
+		
+		log.debug("Entering with {}", fund.getLegalName());
 		
 		XSSFSheet spreadsheet = workbook.createSheet(fund.getIsin());
 		
@@ -148,6 +170,8 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	
 	
 	private void addFundHoldingHeaders(XSSFSheet spreadsheet) {
+		
+		log.debug("Entering");
 		
 		XSSFRow row = spreadsheet.createRow(0);
 		
@@ -168,6 +192,8 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	
 	private void addFundHoldingRow(int rowIndex, final XSSFSheet spreadsheet, final Fund fund, final FundHolding fundHolding) {
 		
+		log.debug("Entering with row {}, Fund {}", rowIndex, fund.getLegalName());
+		
 		XSSFRow row = spreadsheet.createRow(rowIndex);
 		 
 		int columnIndex = 0;
@@ -175,9 +201,11 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		row.createCell(columnIndex++).setCellValue(fundHolding.getId());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getExternalId());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getName());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCountry());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCountryCode());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getLocalCurrencyCode());
+		
+		createPossibleCell(row, columnIndex++, fundHolding.getCountry());
+		createPossibleCell(row, columnIndex++, fundHolding.getCountryCode());
+		createPossibleCell(row, columnIndex++, fundHolding.getLocalCurrencyCode());
+						
 		row.createCell(columnIndex++).setCellValue(fundHolding.getAssetClass());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getMarketValue());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getWeighting());
@@ -185,5 +213,14 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 		row.createCell(columnIndex++).setCellValue(fund.getAssetUnderManagement().doubleValue() * fundHolding.getAdjustedWeighting());
 	}
+	
+	private void createPossibleCell(final XSSFRow row, int columnIndex, String value) {
 		
+		if("N/A".equalsIgnoreCase(value)) {
+			row.createCell(columnIndex++).setCellType(CellType.BLANK);
+		} else {
+			row.createCell(columnIndex++).setCellValue(value);
+		}
+	}
+
 }

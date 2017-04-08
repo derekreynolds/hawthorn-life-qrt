@@ -41,7 +41,7 @@ public class FundServiceImpl implements FundService {
 	@Override
 	public Fund getFundSummary(final File file) {
 		
-		log.debug("Processing file {}", file.getAbsoluteFile());
+		log.debug("Entering with {}", file.getAbsoluteFile());
 		
 		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
 		DocumentBuilder dBuilder;
@@ -55,10 +55,11 @@ public class FundServiceImpl implements FundService {
 			return createFund(document);
 			
 		} catch (ParserConfigurationException | SAXException | IOException e) {
-			log.error("Error processing file {}", file.getAbsoluteFile());
-			e.printStackTrace();
+			log.error("Error reading file {}", file.getAbsoluteFile());
+			log.error("Exception", e);
+			throw new XmlFileException("Error reading file: " +  file.getAbsoluteFile());
 		}
-		return null;
+		
 	}
 
 	/* (non-Javadoc)
@@ -81,6 +82,8 @@ public class FundServiceImpl implements FundService {
 	
 	@SneakyThrows
 	private String getName(Document document) {
+		
+		log.debug("Entering");
 				
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundBasics/Name");
 		
@@ -89,6 +92,8 @@ public class FundServiceImpl implements FundService {
 	
 	@SneakyThrows
 	private String getLegalName(Document document) {
+		
+		log.debug("Entering");
 				
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundBasics/LegalName");
 		
@@ -97,6 +102,8 @@ public class FundServiceImpl implements FundService {
 	
 	@SneakyThrows
 	private String getIsin(Document document) {
+		
+		log.debug("Entering");
 				
 		XPathExpression expr = xpath.compile("/FundShareClass/Operation/ShareClassBasics/ISIN");
 		
@@ -105,6 +112,8 @@ public class FundServiceImpl implements FundService {
 	
 	@SneakyThrows
 	private String getDomicile(Document document) {
+		
+		log.debug("Entering");
 			
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundBasics/Domicile");
 		
@@ -116,6 +125,8 @@ public class FundServiceImpl implements FundService {
 	
 	@SneakyThrows
 	private String getDomicileCode(Document document) {
+		
+		log.debug("Entering");
 			
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundBasics/Domicile/@_Id");
 		

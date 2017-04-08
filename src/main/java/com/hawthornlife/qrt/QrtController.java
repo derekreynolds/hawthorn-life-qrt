@@ -1,6 +1,5 @@
 package com.hawthornlife.qrt;
 
-import javafx.scene.*;
 import javafx.stage.*;
 import javafx.fxml.*;
 
@@ -30,15 +29,13 @@ import com.hawthornlife.qrt.service.InvestmentReportServiceImpl;
 
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Alert;
 import javafx.event.*;
 import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
-import javafx.concurrent.Service;
-import javafx.concurrent.Task;
-
 import javafx.scene.control.TextFormatter;
 
-import javafx.util.converter.DoubleStringConverter;;
+import javafx.util.converter.DoubleStringConverter;
 
 /**
  * Controller for main window in the application.
@@ -91,29 +88,41 @@ public class QrtController {
 		int row = 0;
 		int column = 0;
 		
-		for(File file: selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"))) {
-			
-			Fund fund = fundService.getFundSummary(file);
-			funds.put(fund.getIsin(), fund);
-			layoutFunds(row, column, fund);
-			if(column == 2) {
-				row++;
-				column = 0;
-			} else {
-				column = 2;
-			}
-		}
+		try {
 		
+			for(File file: selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"))) {
+				
+				Fund fund = fundService.getFundSummary(file);
+				funds.put(fund.getIsin(), fund);
+				layoutFunds(row, column, fund);
+				if(column == 2) {
+					row++;
+					column = 0;
+				} else {
+					column = 2;
+				}
+			}
+			
+		} catch(Exception ex) {
+			
+			Alert alert = new Alert(Alert.AlertType.ERROR);
+			
+			alert.setTitle("Hawthorn Life QRT");
+			alert.setHeaderText("Report Error");
+			alert.setContentText(ex.getMessage());
+
+			alert.showAndWait();
+		}
 		
 	}
 	
 	/**
 	 * Handles the exit event. Closes the application. 
 	 * 
-	 * @param e
+	 * @param event
 	 */
 	@FXML
-	public void onClickExit(final ActionEvent e) {
+	public void onClickExit(final ActionEvent event) {
 			
 		log.info("Exiting");
 		
@@ -125,21 +134,17 @@ public class QrtController {
 	 * Generates the Investment report based on the funds read from the XML.
 	 * The report will only contain funds with an AUM greater than zero.
 	 * 
-	 * @param e
+	 * @param event
 	 */
 	@FXML
-	public void onClickGenerateReport(final ActionEvent e) {
+	public void onClickGenerateReport(final ActionEvent event) {
 		
 		log.info("Generating Investment Report");
 		
 		mainGrid.requestFocus();
 		
 		ProgressDialog<String> progressDialog = new ProgressDialog<>(main.getScene().getWindow(), "Generating Investment Report");
-		
-		progressDialog.addTaskEndNotification(result -> {
-			System.out.println(result);		       
-		});
-		 
+				 
 		progressDialog.exec("Calculating", inputParam -> {
 		       
 			ExecutorService executor = Executors.newWorkStealingPool();
@@ -147,12 +152,10 @@ public class QrtController {
 			List<Callable<Boolean>> callables = new ArrayList<>();
 			
 			FundHoldingService fundHoldingService = new FundHoldingServiceImpl();
-			
-			for(Fund fund: this.funds.values()) {
-				if(fund.getAssetUnderManagement() > 0.0) {
-					callables.add(new FundHoldingCallable(fundHoldingService, fund));
-				}
-			}
+						
+			this.funds.values().stream()
+				.filter(f -> f.getAssetUnderManagement() > 0.0)
+				.forEach(f -> callables.add(new FundHoldingCallable(fundHoldingService, f)));
 			
 			try {
 				

@@ -29,9 +29,7 @@ import lombok.SneakyThrows;
  */
 public class FundHoldingServiceImpl implements FundHoldingService {
 
-
-	private static Logger log = LoggerFactory.getLogger(FundService.class);
-
+	private static Logger log = LoggerFactory.getLogger(FundHoldingServiceImpl.class);
 	
 	private XPathFactory xPathfactory = XPathFactory.newInstance();
 	
@@ -46,7 +44,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@Override
 	public SortedMap<Integer, FundHolding> getFundHoldings(final Fund fund) {
 		
-		log.info("Getting fund holdings for {} - {}", fund.getLegalName(), fund.getIsin());
+		log.debug("Entering with {} - {}", fund.getLegalName(), fund.getIsin());
 		
 		return createFundHoldings(fund.getDocument());
 	}
@@ -54,6 +52,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 
 	@SneakyThrows
 	private SortedMap<Integer, FundHolding> createFundHoldings(Document document) {
+		
+		log.debug("Entering");
 		
 		SortedMap<Integer, FundHolding> fundHoldings = new TreeMap<>();		
 		
@@ -71,6 +71,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	@SneakyThrows
 	private FundHolding getFundHolding(Node node) {
+		
+		log.debug("Entering");
 		
 		FundHolding fundHolding = new FundHolding();
 			
@@ -95,6 +97,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private String getName(Node node) {
 		
+		log.debug("Entering");
+		
 		XPathExpression expr =  xpath.compile("./@ExternalName");
 		
 		return expr.evaluate(node);
@@ -102,6 +106,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	@SneakyThrows
 	private String getCountry(Node node) {
+		
+		log.debug("Entering");
 		
 		XPathExpression expr =  xpath.compile("./Country");
 		
@@ -113,6 +119,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private String getCountryCode(Node node) {
 		
+		log.debug("Entering");
+		
 		XPathExpression expr =  xpath.compile("./Country/@_Id");
 		
 		String countryCode = expr.evaluate(node);
@@ -123,6 +131,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private String getId(Node node) {
 		
+		log.debug("Entering");
+		
 		XPathExpression expr =  xpath.compile("./@_StorageId");
 		
 		return expr.evaluate(node);
@@ -130,6 +140,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	@SneakyThrows
 	private String getExternalId(Node node) {
+		
+		log.debug("Entering");
 		
 		XPathExpression expr =  xpath.compile("./@_ExternalId");
 		
@@ -139,6 +151,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private String getWeighting(Node node) {
 		
+		log.debug("Entering");
+		
 		XPathExpression expr =  xpath.compile("./Weighting");
 		
 		return expr.evaluate(node);
@@ -146,6 +160,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	@SneakyThrows
 	private String getMarketValue(Node node) {
+		
+		log.debug("Entering");
 		
 		XPathExpression expr =  xpath.compile("./MarketValue");
 		
@@ -155,6 +171,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private String getAssetClass(Node node) {
 		
+		log.debug("Entering");
+		
 		XPathExpression expr =  xpath.compile("./UAC");
 		
 		return expr.evaluate(node);
@@ -162,6 +180,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	@SneakyThrows
 	private String getLocalCurrencyCode(Node node) {
+		
+		log.debug("Entering");
 		
 		XPathExpression expr =  xpath.compile("./LocalCurrencyCode");
 		

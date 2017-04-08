@@ -31,7 +31,9 @@ public class FundHoldingCallable implements Callable<Boolean> {
 	@Override
 	public Boolean call() throws Exception {
 		
-		log.debug("Getting fund holdings for {}", fund.getLegalName());
+		log.debug("Entering");
+		
+		log.info("Getting fund holdings for {}", fund.getLegalName());
 		
 		fund.setFundHoldings(fundHoldingService.getFundHoldings(fund));
 		
