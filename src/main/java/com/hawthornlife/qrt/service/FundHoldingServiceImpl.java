@@ -14,7 +14,7 @@ import javax.xml.xpath.XPathFactory;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -46,12 +46,12 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering with {} - {}", fund.getLegalName(), fund.getIsin());
 		
-		return createFundHoldings(fund.getDocument());
+		return createFundHoldings(fund);
 	}
 
 
 	@SneakyThrows
-	private SortedMap<Integer, FundHolding> createFundHoldings(Document document) {
+	private SortedMap<Integer, FundHolding> createFundHoldings(Fund fund) {
 		
 		log.debug("Entering");
 		
@@ -59,10 +59,10 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/PortfolioList/Portfolio/AggregatedHolding/HoldingDetail");
 	
-		NodeList holdings = (NodeList)expr.evaluate(document, XPathConstants.NODESET);
+		NodeList holdings = (NodeList)expr.evaluate(fund.getDocument(), XPathConstants.NODESET);
 		
 		for(int i = 0; i < holdings.getLength(); i++) {
-			FundHolding fundHolding = getFundHolding(holdings.item(i));
+			FundHolding fundHolding = getFundHolding(holdings.item(i));			
 			fundHoldings.put(fundHolding.getId(), fundHolding);
 		}
 				

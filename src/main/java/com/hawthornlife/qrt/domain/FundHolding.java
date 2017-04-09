@@ -23,4 +23,5 @@ public @Data class FundHolding {
 	private Double weighting;
 	
 	private Double adjustedWeighting;
+
 }

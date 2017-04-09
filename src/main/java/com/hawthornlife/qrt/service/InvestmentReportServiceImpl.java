@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -16,10 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import org.codehaus.plexus.util.FileUtils;
 
 import com.hawthornlife.qrt.domain.Fund;
@@ -39,9 +40,15 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	
 	private final SortedMap<String, Fund> funds;
 	
+	private final List<Map<String, List<FundHolding>>> groupedAssetClassAggregation = new ArrayList<>();
+	
+	
+	
 	public InvestmentReportServiceImpl(SortedMap<String, Fund> funds) {
 		this.funds = funds;
 	}
+	
+	
 	
 	@SneakyThrows
 	@Override
@@ -58,8 +65,11 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		FileUtils.forceMkdir(new File(text));
 		
 		FileOutputStream out = new FileOutputStream(new File(text + "/Hawthorn-Life-QRT.xlsx"));
+		
 		workbook.write(out);
+		
 		out.close();
+		
 	}
 	
 	private void createAumSheet() {
@@ -67,6 +77,11 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		log.debug("Entering");
 		
 		int rowIndex = 0;
+		Integer combinedSheetRowIndex = 0;
+		
+		XSSFSheet combinedSpreadsheet = workbook.createSheet("Combined Asset Class");
+		
+		addAssetClassHeader(combinedSpreadsheet);
 		
 		XSSFSheet spreadsheet = workbook.createSheet("AUM Summary");
 		 
@@ -92,9 +107,10 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 			
 			createFundHoldingSheet(fund);	
 			createAssetClassSheet(fund);
-						
-		 }
+			createCombinedAssetClassSheet(combinedSpreadsheet, fund, combinedSheetRowIndex);			
+		 }		
 		
+		workbook.setSheetOrder("Combined Asset Class", workbook.getNumberOfSheets() - 1);
 	}
 
 	private void createAssetClassSheet(final Fund fund) {
@@ -103,35 +119,9 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 		XSSFSheet spreadsheet = workbook.createSheet(fund.getIsin() + " - Asset Class");
 
-		Map<String, List<FundHolding>> assetClassAggregation = fund.getFundHoldings()
-				.values()
-				.stream()
-				.collect(Collectors.groupingBy(fh -> fh.getAssetClass() 
-								+ ":" + fh.getCountryCode() + ":" + fh.getLocalCurrencyCode()));
-
 		addAssetClassHeader(spreadsheet);
 		
-		int rowIndex = 0;
-		
-		for(String key : assetClassAggregation.keySet()) {
-			
-			int columnIndex = 0;
-			
-			XSSFRow row = spreadsheet.createRow(++rowIndex);
-			
-			row.createCell(columnIndex++).setCellValue(fund.getIsin());
-			
-			for(String keyPart: key.split(":")) {
-				createPossibleCell(row, columnIndex++, keyPart);				
-			}
-			
-			double summedAdjustedWeight = assetClassAggregation.get(key)
-					.stream()
-					.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
-			
-			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight);
-			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight * fund.getAssetUnderManagement());
-		}
+		addAssetClassRows(spreadsheet, fund, new Integer(0));		
 	
 	}
 	
@@ -152,6 +142,38 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 	}
 
+	private void createCombinedAssetClassSheet(XSSFSheet combinedSpreadsheet, Fund fund, Integer rowIndex) {
+		
+		log.debug("Entering");	
+					
+		addAssetClassRows(combinedSpreadsheet, fund, rowIndex);		
+		
+	}
+	
+	private void addAssetClassRows(XSSFSheet spreadsheet, Fund fund, Integer rowIndex) {
+		
+		Map<String, List<FundHolding>> assetClassAggregation = groupByAssetClass(fund);		
+		
+		for(String key : assetClassAggregation.keySet()) {
+			
+			int columnIndex = 0;
+			
+			XSSFRow row = spreadsheet.createRow(++rowIndex);
+						
+			for(String keyPart: key.split(":")) {
+				createPossibleCell(row, columnIndex++, keyPart);				
+			}
+			
+			double summedAdjustedWeight = assetClassAggregation.get(key)
+					.stream()
+					.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
+			
+			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight);
+			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight * fund.getAssetUnderManagement());
+		}
+		
+	}
+	
 	private void createFundHoldingSheet(final Fund fund) {
 		
 		log.debug("Entering with {}", fund.getLegalName());
@@ -221,6 +243,16 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		} else {
 			row.createCell(columnIndex++).setCellValue(value);
 		}
+	}
+	
+	private Map<String, List<FundHolding>> groupByAssetClass(Fund fund) {
+		
+		return fund.getFundHoldings()
+				.values()
+				.stream()
+				.collect(Collectors.groupingBy(fh -> fund.getIsin() + ":" + fh.getAssetClass() 
+								+ ":" + fh.getCountryCode() + ":" + fh.getLocalCurrencyCode()));
+
 	}
 
 }

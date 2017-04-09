@@ -1,2 +1,2 @@
-# hawthorn-life-qrt
+# Hawthorn Life QRT
 SII Investment Report

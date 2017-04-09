@@ -88,26 +88,62 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
+            
+           
+		     <plugin>
+		      	<groupId>org.projectlombok</groupId>
+		      	<artifactId>lombok-maven-plugin</artifactId>
+		     	 <version>1.16.8.0</version>
+		      	<executions>
+		        	<execution>
+		          	<phase>generate-sources</phase>
+		          	<goals>
+		            	<goal>delombok</goal>
+		          	</goals>	        	         
+		        </execution>	
+		      	</executions>
+		    </plugin>
+            
         </plugins>
+        
+        
     </pluginManagement>
-    
-    <plugins>
-        <plugin>
-	      <groupId>org.projectlombok</groupId>
-	      <artifactId>lombok-maven-plugin</artifactId>
-	      <version>1.16.8.0</version>
-	      <executions>
-	        <execution>
-	          <phase>generate-sources</phase>
-	          <goals>
-	            <goal>delombok</goal>
-	          </goals>	        	         
-	        </execution>
-
-	      </executions>
-	    </plugin>
-    </plugins>
-    
+        
+        <plugins>
+	        <plugin>
+			  <groupId>org.apache.maven.plugins</groupId>
+			  <artifactId>maven-assembly-plugin</artifactId>
+			  <version>2.4</version>
+			  <executions>
+			    <execution>
+			      <id>create-my-bundle</id>
+			      <phase>package</phase>
+			      <goals>
+			        <goal>single</goal>
+			      </goals>
+			      <configuration>
+			        <descriptorRefs>
+			          <descriptorRef>jar-with-dependencies</descriptorRef>
+			        </descriptorRefs>
+			        <archive>
+					  <manifest>
+						<mainClass>com.hawthornlife.qrt.QrtApplication</mainClass>
+					  </manifest>
+					</archive>
+			       <executions>
+		        		<execution>
+				          <phase>package</phase>
+				          <goals>
+				            <goal>single</goal>
+				          </goals>
+				        </execution>
+		      		</executions>	      
+			      </configuration>
+			    </execution>
+			  </executions>
+			</plugin>
+		</plugins>
+        
 	</build>
   
 </project>

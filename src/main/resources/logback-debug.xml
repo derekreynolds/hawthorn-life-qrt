@@ -17,10 +17,10 @@
       <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36}.%M %L - %msg%n</pattern>
     </encoder>
   </appender>   
-  <logger name="com.hawthornlife" level="INFO"/>
+  <logger name="com.hawthornlife" level="DEBUG"/>
    
  
-  <root level="info">
+  <root level="debug">
     <appender-ref ref="FILE" />
   </root>
   
