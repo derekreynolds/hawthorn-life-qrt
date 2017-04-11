@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -139,6 +140,8 @@ public class QrtController {
 	@FXML
 	public void onClickGenerateReport(final ActionEvent event) {
 		
+		log.debug("Entering");
+		
 		log.info("Generating Investment Report");
 		
 		mainGrid.requestFocus();
@@ -158,16 +161,21 @@ public class QrtController {
 				.forEach(f -> callables.add(new FundHoldingCallable(fundHoldingService, f)));
 			
 			try {
+						
+				for(Future<Boolean> result: executor.invokeAll(callables)) {
+					if(!result.get())
+						return new Integer(0);
+				}
 				
-				List<Future<Boolean>> results = executor.invokeAll(callables);
-				
-			} catch (InterruptedException e1) {
-				// TODO Auto-generated catch block
-				e1.printStackTrace();
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Error reading the fund holdings.", e);
+				return new Integer(0);
+			} finally {
+				log.debug("Shutting down executor.");
+				executor.shutdown();
 			}
 			
-			executor.shutdown();
-			
+		
 			InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
 			
 			InvestmentReportService.generate();
@@ -175,6 +183,30 @@ public class QrtController {
 		    return new Integer(1);
 		});
 		
+		progressDialog.addTaskEndNotification(value -> {
+			
+			if(value == 1) {
+				
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				
+				alert.setTitle("Hawthorn Life QRT");
+				alert.setHeaderText("Report Generated Successfully");
+				alert.setContentText("Hawthorn Life QRT successfully generated.");
+	
+				alert.showAndWait();
+				
+			} else {
+				
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				
+				alert.setTitle("Hawthorn Life QRT");
+				alert.setHeaderText("Report Generation Error");
+				alert.setContentText("An error occured while generating the QRT report. Please consult log files.");
+
+				alert.showAndWait();
+			}
+			
+		});		
 		
 	}
 	
@@ -195,9 +227,9 @@ public class QrtController {
 	            change -> {
 	                String newText = change.getControlNewText() ;
 	                if (validDoubleText.matcher(newText).matches()) {
-	                    return change ;
+	                    return change;
 	                } else 
-	                	return null ;
+	                	return null;
 	            });
 
 		aumField.setTextFormatter(textFormatter);
@@ -206,7 +238,7 @@ public class QrtController {
         	fund.setAssetUnderManagement(newValue);
         });		
 		
-		Label aumLabel = new Label(fund.getLegalName() + " (" + fund.getIsin() + ")"); // F is mnemonic
+		Label aumLabel = new Label(fund.getLegalName() + " (" + fund.getIsin() + ")");
 		aumLabel.setLabelFor(aumField);
 		
 		mainGrid.add(aumLabel, column, row);

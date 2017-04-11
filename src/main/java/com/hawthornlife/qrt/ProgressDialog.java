@@ -23,7 +23,7 @@ import javafx.collections.ListChangeListener;
 import java.util.function.Consumer;
 import java.util.function.ToIntFunction;
  
-
+@SuppressWarnings("restriction")
 public class ProgressDialog<P> {
  
     private Task animationWorker;

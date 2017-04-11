@@ -3,6 +3,8 @@
  */
 package com.hawthornlife.qrt.service;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -46,7 +48,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering with {} - {}", fund.getLegalName(), fund.getIsin());
 		
-		return createFundHoldings(fund);
+		return adjust(createFundHoldings(fund));
 	}
 
 
@@ -190,5 +192,32 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		return StringUtils.isBlank(localCurrencyCode) ? "N/A" : localCurrencyCode;
 	}
 
+	private SortedMap<Integer, FundHolding> adjust(final SortedMap<Integer, FundHolding> fundHoldings) {
+		
+		log.debug("Entering");
+		
+		double totalValue = fundHoldings.values()
+				.stream()
+				.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
+		
+		if(totalValue < 1.0) {
+			
+			double delta = 1.0 - totalValue;			
+
+			log.debug("Delta {}", delta);			
+			
+			FundHolding fundHolding = Collections.max(fundHoldings.values(), 
+					Comparator.comparing(fh -> fh.getAdjustedWeighting()));
+			
+			log.debug("Adjusting fund {} with weight {}", fundHolding.getId(), fundHolding.getAdjustedWeighting());
+			
+			fundHolding.setAdjustedWeighting(fundHolding.getAdjustedWeighting() + delta);
+			
+			log.debug("New weight {}", fundHolding.getAdjustedWeighting());
+			
+		}
+		
+		return fundHoldings;
+	}
 	
 }

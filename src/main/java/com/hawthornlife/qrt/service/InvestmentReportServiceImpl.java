@@ -64,7 +64,11 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 		FileUtils.forceMkdir(new File(text));
 		
-		FileOutputStream out = new FileOutputStream(new File(text + "/Hawthorn-Life-QRT.xlsx"));
+		File reportFile = new File(text + "/Hawthorn-Life-QRT.xlsx");
+		
+		FileOutputStream out = new FileOutputStream(reportFile);
+		
+		log.info("Creating report {}", reportFile.getAbsoluteFile());
 		
 		workbook.write(out);
 		

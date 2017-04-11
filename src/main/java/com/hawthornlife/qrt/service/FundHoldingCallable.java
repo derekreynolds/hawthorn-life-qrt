@@ -35,9 +35,18 @@ public class FundHoldingCallable implements Callable<Boolean> {
 		
 		log.info("Getting fund holdings for {}", fund.getLegalName());
 		
-		fund.setFundHoldings(fundHoldingService.getFundHoldings(fund));
+		try {
+			
+			fund.setFundHoldings(fundHoldingService.getFundHoldings(fund));
+			
+		} catch (Exception ex) {
+			log.error("Error getting fund holdings", ex);
+			return false;
+		}
+		
 		
 		return true;
 	}
-
+	
+		
 }
