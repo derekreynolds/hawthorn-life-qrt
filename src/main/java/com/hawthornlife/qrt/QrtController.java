@@ -20,6 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hawthornlife.qrt.domain.Fund;
+import com.hawthornlife.qrt.util.AumObservable;
+import com.hawthornlife.qrt.util.FxUtil;
+import com.hawthornlife.qrt.util.TotalAumObserver;
 import com.hawthornlife.qrt.service.FundHoldingCallable;
 import com.hawthornlife.qrt.service.FundHoldingService;
 import com.hawthornlife.qrt.service.FundHoldingServiceImpl;
@@ -36,7 +39,6 @@ import javafx.scene.layout.*;
 import javafx.stage.DirectoryChooser;
 import javafx.scene.control.TextFormatter;
 
-import javafx.util.converter.DoubleStringConverter;
 
 /**
  * Controller for main window in the application.
@@ -56,12 +58,13 @@ public class QrtController {
 	
 	@FXML
 	private GridPane mainGrid;
-	
+		
 	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	
-	private SortedMap<String, Fund> funds = new TreeMap<>();
+	private SortedMap<String, Fund> funds = new TreeMap<>();	
 	
-	private Pattern validDoubleText = Pattern.compile("((\\d*)|(\\d+\\.\\d*))");
+	private AumObservable aumObservable = new AumObservable();
+	
 	
 	/**
 	 * Presents a dialog to navigate to the directory where the XML files are
@@ -103,6 +106,8 @@ public class QrtController {
 					column = 2;
 				}
 			}
+			
+			layoutTotal(++row);
 			
 		} catch(Exception ex) {
 			
@@ -218,34 +223,43 @@ public class QrtController {
 	 */
 	private void layoutFunds(int row, int column, Fund fund) {
 		
-		log.debug("Layout row {}, column {} - {}", row, column, fund.getLegalName());
+		log.debug("Entering with row {}, column {} - {}", row, column, fund.getLegalName());
 		
 		TextField aumField = new TextField();
 		aumField.setText("0");
 		
-		TextFormatter<Double> textFormatter = new TextFormatter<Double>(new DoubleStringConverter(), 0.0, 
-	            change -> {
-	                String newText = change.getControlNewText() ;
-	                if (validDoubleText.matcher(newText).matches()) {
-	                    return change;
-	                } else 
-	                	return null;
-	            });
+		TextFormatter<Double> textFormatter = FxUtil.doubleTextFormatter();
 
-		aumField.setTextFormatter(textFormatter);
-
-        textFormatter.valueProperty().addListener((obs, oldValue, newValue) -> {
+		textFormatter.valueProperty().addListener((obs, oldValue, newValue) -> {
         	fund.setAssetUnderManagement(newValue);
-        });		
+        	aumObservable.update();        	
+        });	
+				
+		aumField.setTextFormatter(textFormatter);        	
 		
 		Label aumLabel = new Label(fund.getLegalName() + " (" + fund.getIsin() + ")");
 		aumLabel.setLabelFor(aumField);
 		
 		mainGrid.add(aumLabel, column, row);
-		mainGrid.add(aumField, column + 1, row);
-		
+		mainGrid.add(aumField, column + 1, row);		
 
 	}
 	
+	private void layoutTotal(int rowIndex) {
+		
+		log.debug("Entering with {}", rowIndex);
+		
+		Label aumLabel = new Label("Assets Under Management Total");
+		
+		TextField aumField = new TextField();
+		aumField.setText("0.0");
+		aumField.setTextFormatter(FxUtil.doubleTextFormatter());
+						
+		aumObservable.addObserver(new TotalAumObserver(aumField, this.funds.values()));
+		
+		mainGrid.add(aumLabel, 0, rowIndex);
+		mainGrid.add(aumField, 1, rowIndex);
+		
+	}
 
 }

@@ -52,7 +52,7 @@
                   <ColumnConstraints minWidth="10.0" prefWidth="100.0" percentWidth="35"/>
                   <ColumnConstraints minWidth="10.0" prefWidth="100.0" percentWidth="15"/>
                </columnConstraints>                 
-            </GridPane>
+            </GridPane>            
          </content>
       </ScrollPane>
   </children>
