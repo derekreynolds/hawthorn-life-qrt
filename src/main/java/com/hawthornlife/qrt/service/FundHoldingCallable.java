@@ -9,8 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hawthornlife.qrt.domain.Fund;
+import com.hawthornlife.qrt.domain.FundHolding;
 
 /**
+ * Used to create a thread that will get the {@link FundHolding}s.
+ * 
  * @author Derek Reynolds
  *
  */

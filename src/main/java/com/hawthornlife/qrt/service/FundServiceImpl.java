@@ -10,6 +10,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,9 +20,11 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.hawthornlife.qrt.domain.Fund;
-import lombok.SneakyThrows;
+
 
 /**
+ * This service reads the Fund level data that is needed for the reports.
+ * 
  * @author Derek Reynolds
  *
  */
@@ -33,6 +36,7 @@ public class FundServiceImpl implements FundService {
 	private XPathFactory xPathfactory = XPathFactory.newInstance();
 	
 	private XPath xpath;
+	
 	
 	public FundServiceImpl() {
 		xpath = xPathfactory.newXPath();
@@ -54,7 +58,7 @@ public class FundServiceImpl implements FundService {
 			
 			return createFund(document);
 			
-		} catch (ParserConfigurationException | SAXException | IOException e) {
+		} catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException e) {
 			log.error("Error reading file {}", file.getAbsoluteFile());
 			log.error("Exception", e);
 			throw new XmlFileException("Error reading file: " +  file.getAbsoluteFile());
@@ -65,7 +69,7 @@ public class FundServiceImpl implements FundService {
 	/* (non-Javadoc)
 	 * @see com.hawthornlife.qrt.service.FileService#createFund(org.w3c.dom.Document)
 	 */
-	private Fund createFund(Document document) {
+	private Fund createFund(Document document) throws XPathExpressionException {
 		
 		Fund fund = new Fund();
 		
@@ -80,8 +84,7 @@ public class FundServiceImpl implements FundService {
 	}	
 	
 	
-	@SneakyThrows
-	private String getName(Document document) {
+	private String getName(Document document) throws XPathExpressionException {
 		
 		log.debug("Entering");
 				
@@ -90,8 +93,7 @@ public class FundServiceImpl implements FundService {
 		return expr.evaluate(document);
 	}
 	
-	@SneakyThrows
-	private String getLegalName(Document document) {
+	private String getLegalName(Document document) throws XPathExpressionException {
 		
 		log.debug("Entering");
 				
@@ -100,8 +102,7 @@ public class FundServiceImpl implements FundService {
 		return expr.evaluate(document);
 	}
 	
-	@SneakyThrows
-	private String getIsin(Document document) {
+	private String getIsin(Document document) throws XPathExpressionException {
 		
 		log.debug("Entering");
 				
@@ -110,8 +111,7 @@ public class FundServiceImpl implements FundService {
 		return expr.evaluate(document);
 	}
 	
-	@SneakyThrows
-	private String getDomicile(Document document) {
+	private String getDomicile(Document document) throws XPathExpressionException {
 		
 		log.debug("Entering");
 			
@@ -123,8 +123,7 @@ public class FundServiceImpl implements FundService {
 		
 	}
 	
-	@SneakyThrows
-	private String getDomicileCode(Document document) {
+	private String getDomicileCode(Document document) throws XPathExpressionException {
 		
 		log.debug("Entering");
 			
@@ -133,8 +132,7 @@ public class FundServiceImpl implements FundService {
 		String countryCode = expr.evaluate(document);
 		
 		return StringUtils.isBlank(countryCode) ? "N/A" : countryCode;
-	}
-	
+	}	
 	
 	
 }

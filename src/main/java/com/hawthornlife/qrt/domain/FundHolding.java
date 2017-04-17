@@ -2,6 +2,12 @@ package com.hawthornlife.qrt.domain;
 
 import lombok.Data;
 
+/**
+ * Fund holdings for each {@link Fund}
+ * 
+ * @author Derek Reynolds
+ *
+ */
 public @Data class FundHolding {
 
 	private Integer id;

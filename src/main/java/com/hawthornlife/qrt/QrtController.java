@@ -14,13 +14,13 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.hawthornlife.qrt.domain.Fund;
-import com.hawthornlife.qrt.util.AumObservable;
+import com.hawthornlife.qrt.util.FundAumObservable;
 import com.hawthornlife.qrt.util.FxUtil;
 import com.hawthornlife.qrt.util.TotalAumObserver;
 import com.hawthornlife.qrt.service.FundHoldingCallable;
@@ -58,12 +58,10 @@ public class QrtController {
 	
 	@FXML
 	private GridPane mainGrid;
-		
-	private DirectoryChooser directoryChooser = new DirectoryChooser();
 	
 	private SortedMap<String, Fund> funds = new TreeMap<>();	
 	
-	private AumObservable aumObservable = new AumObservable();
+	private FundAumObservable aumObservable = new FundAumObservable();
 	
 	
 	/**
@@ -77,6 +75,8 @@ public class QrtController {
 	public void onClickOpen() throws IOException {
 		
 		log.info("Selecting XML directory");
+		
+		DirectoryChooser directoryChooser = new DirectoryChooser();
 		
 		directoryChooser.setTitle("Select Morningstar XML Directory");
 		
@@ -94,6 +94,8 @@ public class QrtController {
 		
 		try {
 		
+			StopWatch watch = StopWatch.createStarted();
+			
 			for(File file: selectedDirectory.listFiles((dir, name) -> name.toLowerCase().endsWith(".xml"))) {
 				
 				Fund fund = fundService.getFundSummary(file);
@@ -108,6 +110,10 @@ public class QrtController {
 			}
 			
 			layoutTotal(++row);
+			
+			watch.stop();
+			
+			log.debug("Time taken to read XML files: {}", watch.getTime());
 			
 		} catch(Exception ex) {
 			
@@ -155,6 +161,8 @@ public class QrtController {
 				 
 		progressDialog.exec("Calculating", inputParam -> {
 		       
+			StopWatch watch = StopWatch.createStarted();
+			
 			ExecutorService executor = Executors.newWorkStealingPool();
 
 			List<Callable<Boolean>> callables = new ArrayList<>();
@@ -180,10 +188,16 @@ public class QrtController {
 				executor.shutdown();
 			}
 			
+			watch.split();
+			log.debug("Time taken to read fund holdings: {}", watch.getSplitTime());
 		
 			InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
 			
 			InvestmentReportService.generate();
+			
+			watch.stop();
+			
+			log.debug("Time taken to generate report: {}", watch.getTime());
 			
 		    return new Integer(1);
 		});
@@ -211,11 +225,13 @@ public class QrtController {
 				alert.showAndWait();
 			}
 			
-		});		
+		});
+		
 		
 	}
 	
 	/**
+	 * Lays out the Label and Text box pair in a column. Two column pairs per row.
 	 * 
 	 * @param row
 	 * @param column
@@ -232,7 +248,7 @@ public class QrtController {
 
 		textFormatter.valueProperty().addListener((obs, oldValue, newValue) -> {
         	fund.setAssetUnderManagement(newValue);
-        	aumObservable.update();        	
+        	aumObservable.update(newValue);        	
         });	
 				
 		aumField.setTextFormatter(textFormatter);        	
@@ -245,6 +261,11 @@ public class QrtController {
 
 	}
 	
+	/**
+	 * Lays out the total AUM textbox.
+	 * 
+	 * @param rowIndex
+	 */
 	private void layoutTotal(int rowIndex) {
 		
 		log.debug("Entering with {}", rowIndex);

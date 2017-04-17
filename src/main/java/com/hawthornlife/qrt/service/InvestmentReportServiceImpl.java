@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -39,9 +38,7 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	private final XSSFWorkbook workbook = new XSSFWorkbook();
 	
 	private final SortedMap<String, Fund> funds;
-	
-	private final List<Map<String, List<FundHolding>>> groupedAssetClassAggregation = new ArrayList<>();
-	
+		
 	
 	
 	public InvestmentReportServiceImpl(SortedMap<String, Fund> funds) {
