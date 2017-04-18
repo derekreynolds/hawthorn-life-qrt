@@ -5,6 +5,7 @@ import javafx.fxml.*;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -189,7 +190,7 @@ public class QrtController {
 			}
 			
 			watch.split();
-			log.debug("Time taken to read fund holdings: {}", watch.getSplitTime());
+			log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
 		
 			InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
 			
@@ -197,7 +198,7 @@ public class QrtController {
 			
 			watch.stop();
 			
-			log.debug("Time taken to generate report: {}", watch.getTime());
+			log.info("Time taken to generate report: {}", watch.getTime());
 			
 		    return new Integer(1);
 		});
@@ -244,11 +245,11 @@ public class QrtController {
 		TextField aumField = new TextField();
 		aumField.setText("0");
 		
-		TextFormatter<Double> textFormatter = FxUtil.doubleTextFormatter();
+		TextFormatter<BigDecimal> textFormatter = FxUtil.bigDecimalTextFormatter();
 
 		textFormatter.valueProperty().addListener((obs, oldValue, newValue) -> {
-        	fund.setAssetUnderManagement(newValue);
-        	aumObservable.update(newValue);        	
+        	fund.setAssetUnderManagement(newValue.doubleValue());
+        	aumObservable.update(newValue.doubleValue());        	
         });	
 				
 		aumField.setTextFormatter(textFormatter);        	
@@ -274,7 +275,7 @@ public class QrtController {
 		
 		TextField aumField = new TextField();
 		aumField.setText("0.0");
-		aumField.setTextFormatter(FxUtil.doubleTextFormatter());
+		aumField.setTextFormatter(FxUtil.bigDecimalTextFormatter());
 						
 		aumObservable.addObserver(new TotalAumObserver(aumField, this.funds.values()));
 		

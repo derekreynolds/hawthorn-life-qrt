@@ -3,10 +3,11 @@
  */
 package com.hawthornlife.qrt.util;
 
+import java.math.BigDecimal;
 import java.util.regex.Pattern;
 
 import javafx.scene.control.TextFormatter;
-import javafx.util.converter.DoubleStringConverter;
+import javafx.util.converter.BigDecimalStringConverter;
 
 /**
  * Util class for Java FX components.
@@ -24,8 +25,8 @@ public class FxUtil {
 	 * 
 	 * @return {@link TextFormatter} 
 	 */
-	public static TextFormatter<Double> doubleTextFormatter() {
-		return new TextFormatter<Double>(new DoubleStringConverter(), 0.0, 	
+	public static TextFormatter<BigDecimal> bigDecimalTextFormatter() {
+		return new TextFormatter<BigDecimal>(new BigDecimalStringConverter(), BigDecimal.ZERO, 	
             change -> {
                 String newText = change.getControlNewText() ;
                 if (validDoubleText.matcher(newText).matches()) {

@@ -5,6 +5,8 @@ package com.hawthornlife.qrt.util;
 
 import javafx.scene.control.TextField;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.Collection;
 import java.util.Observable;
 import java.util.Observer;
@@ -29,6 +31,8 @@ public class TotalAumObserver implements Observer {
 	
 	private final Collection<Fund> funds;
 	
+	NumberFormat formatter = new DecimalFormat("#0.00");     
+
 	
 	public TotalAumObserver(final TextField textField, final Collection<Fund> funds) {
 		this.textField = textField;
@@ -43,11 +47,11 @@ public class TotalAumObserver implements Observer {
 		
 		log.debug("Entering");
 		
-		Double totalAumValue = funds.stream().mapToDouble(f -> f.getAssetUnderManagement()).sum();
+		Double totalAumValue = funds.stream().mapToDouble(f -> f.getAssetUnderManagement()).sum();		
 		
-		log.info("New total AUM is {}", totalAumValue);
+		log.info("New total AUM is {}", formatter.format(totalAumValue));
 		
-		textField.setText(totalAumValue.toString());
+		textField.setText(formatter.format(totalAumValue));
 
 	}
 

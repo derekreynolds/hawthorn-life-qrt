@@ -20,6 +20,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.hawthornlife.qrt.domain.Fund;
+import com.hawthornlife.qrt.util.XmlUtil;
 
 
 /**
@@ -31,9 +32,8 @@ import com.hawthornlife.qrt.domain.Fund;
 public class FundServiceImpl implements FundService {
 
 	private static Logger log = LoggerFactory.getLogger(FundServiceImpl.class);
-
 	
-	private XPathFactory xPathfactory = XPathFactory.newInstance();
+	private XPathFactory xPathfactory = XmlUtil.getXpathFactory().get();
 	
 	private XPath xpath;
 	

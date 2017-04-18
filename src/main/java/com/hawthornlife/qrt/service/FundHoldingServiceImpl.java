@@ -22,6 +22,7 @@ import org.w3c.dom.NodeList;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.domain.FundHolding;
+import com.hawthornlife.qrt.util.XmlUtil;
 
 import lombok.SneakyThrows;
 
@@ -33,7 +34,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 
 	private static Logger log = LoggerFactory.getLogger(FundHoldingServiceImpl.class);
 	
-	private XPathFactory xPathfactory = XPathFactory.newInstance();
+	private XPathFactory xPathfactory = XmlUtil.getXpathFactory().get();
 	
 	private XPath xpath;
 	

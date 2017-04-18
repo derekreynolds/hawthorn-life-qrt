@@ -16,6 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -39,10 +41,15 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 	
 	private final SortedMap<String, Fund> funds;
 		
+	private XSSFCellStyle decimalStyle;
 	
 	
 	public InvestmentReportServiceImpl(SortedMap<String, Fund> funds) {
 		this.funds = funds;
+		
+		decimalStyle=(XSSFCellStyle) workbook.createCellStyle();
+		decimalStyle.setDataFormat(workbook.createDataFormat().getFormat("#0.000000"));
+	
 	}
 	
 	
@@ -56,7 +63,7 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		createAumSheet();
 	     
 		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_km");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_kmm");
 		String text = now.format(formatter);
 		
 		FileUtils.forceMkdir(new File(text));
@@ -78,7 +85,7 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		log.debug("Entering");
 		
 		int rowIndex = 0;
-		Integer combinedSheetRowIndex = 0;
+		int combinedSheetRowIndex = 0;
 		
 		XSSFSheet combinedSpreadsheet = workbook.createSheet("Combined Asset Class");
 		
@@ -86,29 +93,31 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 		XSSFSheet spreadsheet = workbook.createSheet("AUM Summary");
 		 
-		XSSFRow row = spreadsheet.createRow(rowIndex);
+		XSSFRow headerRow = spreadsheet.createRow(rowIndex);
 		 
-		row.createCell(0).setCellValue("ISIN");		
-		row.createCell(1).setCellValue("Fund Name");		 
-		row.createCell(2).setCellValue("Amount");		 
+		headerRow.createCell(0).setCellValue("ISIN");		
+		headerRow.createCell(1).setCellValue("Fund Name");		 
+		headerRow.createCell(2).setCellValue("Amount");		 
 
 		 
 		for(Fund fund: funds.values()) {
 			
 			log.debug("AUM {} {}", fund.getLegalName(), fund.getAssetUnderManagement());
 			
+			int columnIndex = 0;
+			
 			if(fund.getAssetUnderManagement() <= 0.0)
 				continue;
 			
-			XSSFRow r = spreadsheet.createRow(++rowIndex);
+			XSSFRow dataRow = spreadsheet.createRow(++rowIndex);
 			 
-			r.createCell(0).setCellValue(fund.getIsin());
-			r.createCell(1).setCellValue(fund.getLegalName());			
-			r.createCell(2).setCellValue(Double.valueOf(fund.getAssetUnderManagement()));
+			dataRow.createCell(columnIndex++).setCellValue(fund.getIsin());
+			dataRow.createCell(columnIndex++).setCellValue(fund.getLegalName());			
+			this.createNumberCell(dataRow, columnIndex++, fund.getAssetUnderManagement());
 			
 			createFundHoldingSheet(fund);	
 			createAssetClassSheet(fund);
-			createCombinedAssetClassSheet(combinedSpreadsheet, fund, combinedSheetRowIndex);			
+			combinedSheetRowIndex += createCombinedAssetClassSheet(combinedSpreadsheet, fund, combinedSheetRowIndex);			
 		 }		
 		
 		workbook.setSheetOrder("Combined Asset Class", workbook.getNumberOfSheets() - 1);
@@ -143,15 +152,15 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		
 	}
 
-	private void createCombinedAssetClassSheet(XSSFSheet combinedSpreadsheet, Fund fund, Integer rowIndex) {
+	private Integer createCombinedAssetClassSheet(XSSFSheet combinedSpreadsheet, Fund fund, Integer rowIndex) {
 		
 		log.debug("Entering");	
-					
-		addAssetClassRows(combinedSpreadsheet, fund, rowIndex);		
+				
+		return addAssetClassRows(combinedSpreadsheet, fund, rowIndex);		
 		
 	}
 	
-	private void addAssetClassRows(XSSFSheet spreadsheet, Fund fund, Integer rowIndex) {
+	private Integer addAssetClassRows(XSSFSheet spreadsheet, Fund fund, Integer rowIndex) {
 		
 		Map<String, List<FundHolding>> assetClassAggregation = groupByAssetClass(fund);		
 		
@@ -169,9 +178,11 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 					.stream()
 					.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
 			
-			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight);
-			row.createCell(columnIndex++).setCellValue(summedAdjustedWeight * fund.getAssetUnderManagement());
+			createNumberCell(row, columnIndex++, summedAdjustedWeight);
+			createNumberCell(row, columnIndex++, summedAdjustedWeight * fund.getAssetUnderManagement());
 		}
+		
+		return assetClassAggregation.keySet().size();
 		
 	}
 	
@@ -230,20 +241,28 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		createPossibleCell(row, columnIndex++, fundHolding.getLocalCurrencyCode());
 						
 		row.createCell(columnIndex++).setCellValue(fundHolding.getAssetClass());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMarketValue());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getWeighting());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getAdjustedWeighting());
+		createNumberCell(row, columnIndex++, fundHolding.getMarketValue());
+		createNumberCell(row, columnIndex++, fundHolding.getWeighting());
+		createNumberCell(row, columnIndex++, fundHolding.getAdjustedWeighting());
 		
-		row.createCell(columnIndex++).setCellValue(fund.getAssetUnderManagement().doubleValue() * fundHolding.getAdjustedWeighting());
+		createNumberCell(row, columnIndex++, fund.getAssetUnderManagement() * fundHolding.getAdjustedWeighting());
 	}
 	
-	private void createPossibleCell(final XSSFRow row, int columnIndex, String value) {
+	private void createPossibleCell(final XSSFRow row, Integer columnIndex, String value) {
 		
 		if("N/A".equalsIgnoreCase(value)) {
 			row.createCell(columnIndex++).setCellType(CellType.BLANK);
 		} else {
 			row.createCell(columnIndex++).setCellValue(value);
 		}
+	}
+	
+	private void createNumberCell(final XSSFRow row, Integer columnIndex, Double value) {		
+		
+		XSSFCell cell = row.createCell(columnIndex, CellType.NUMERIC);
+		cell.setCellStyle(decimalStyle);
+		cell.setCellValue(value);		
+		
 	}
 	
 	private Map<String, List<FundHolding>> groupByAssetClass(Fund fund) {
