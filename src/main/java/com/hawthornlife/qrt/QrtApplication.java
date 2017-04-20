@@ -23,15 +23,6 @@ public class QrtApplication extends Application {
 	
 	private static Logger log = LoggerFactory.getLogger(QrtApplication.class);
 	
-	private static final String DTM_MANAGER_NAME = "com.sun.org.apache.xml.internal.dtm.DTMManager";
-	
-	private static final String DTM_MANAGER_VALUE = "com.sun.org.apache.xml.internal.dtm.ref.DTMManagerDefault";
-	 
-    static
-    {
-        // performance improvement: https://issues.apache.org/jira/browse/XALANJ-2540
-        System.setProperty(DTM_MANAGER_NAME, DTM_MANAGER_VALUE);
-    }
 	
     public static void main( String[] args )  {
 		

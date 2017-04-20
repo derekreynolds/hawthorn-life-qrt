@@ -181,24 +181,28 @@ public class QrtController {
 						return new Integer(0);
 				}
 				
+				watch.split();
+				log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
+			
+				InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
+				
+				InvestmentReportService.generate();
+				
+				watch.stop();
+				
+				log.info("Time taken to generate report: {}", watch.getTime());
+				
 			} catch (InterruptedException | ExecutionException e) {
 				log.error("Error reading the fund holdings.", e);
+				return new Integer(0);
+			} catch(Exception e) {
+				log.error("Unexpected exception.", e);
 				return new Integer(0);
 			} finally {
 				log.debug("Shutting down executor.");
 				executor.shutdown();
 			}
 			
-			watch.split();
-			log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
-		
-			InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
-			
-			InvestmentReportService.generate();
-			
-			watch.stop();
-			
-			log.info("Time taken to generate report: {}", watch.getTime());
 			
 		    return new Integer(1);
 		});

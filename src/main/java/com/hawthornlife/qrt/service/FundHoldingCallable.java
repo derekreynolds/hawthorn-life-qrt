@@ -5,6 +5,7 @@ package com.hawthornlife.qrt.service;
 
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.time.StopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,7 +41,13 @@ public class FundHoldingCallable implements Callable<Boolean> {
 		
 		try {
 			
+			StopWatch watch = StopWatch.createStarted();
+			
 			fund.setFundHoldings(fundHoldingService.getFundHoldings(fund));
+			
+			watch.stop();
+			
+			log.info("Time taken to get fund holdings: {} for {}", watch.getTime() , fund.getLegalName());
 			
 		} catch (Exception ex) {
 			log.error("Error getting fund holdings", ex);

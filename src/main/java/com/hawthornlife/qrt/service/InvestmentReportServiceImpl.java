@@ -30,6 +30,8 @@ import com.hawthornlife.qrt.domain.FundHolding;
 import lombok.SneakyThrows;
 
 /**
+ * Generates the QRT investment report in an Excel format.
+ * 
  * @author Derek Reynolds
  *
  */
@@ -63,7 +65,7 @@ public class InvestmentReportServiceImpl implements InvestmentReportService {
 		createAumSheet();
 	     
 		LocalDateTime now = LocalDateTime.now();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_kmm");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmm");
 		String text = now.format(formatter);
 		
 		FileUtils.forceMkdir(new File(text));
