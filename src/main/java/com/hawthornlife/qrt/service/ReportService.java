@@ -9,7 +9,7 @@ package com.hawthornlife.qrt.service;
  * @author Derek Reynolds
  *
  */
-public interface InvestmentReportService {
+public interface ReportService {
 	
 	void generate();
 

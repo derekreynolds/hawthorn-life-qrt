@@ -83,6 +83,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		fundHolding.setName(getName(node));
 		fundHolding.setCountry(getCountry(node));	
 		fundHolding.setCountryCode(getCountryCode(node));
+		fundHolding.setCic(getCic(node));
+		fundHolding.setSecurityName(getSecurityName(node));
 		fundHolding.setMarketValue(Double.valueOf(getMarketValue(node)));
 		fundHolding.setWeighting(Double.valueOf(getWeighting(node)));
 		// Adjust the weighting: negative if market value is negative
@@ -92,6 +94,36 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 				: fundHolding.getWeighting() * -1) / 100);
 		fundHolding.setAssetClass(getAssetClass(node));
 		fundHolding.setLocalCurrencyCode(getLocalCurrencyCode(node));
+		fundHolding.setLocalMarketValue(Double.valueOf(getLocalMarketValue(node)));
+		fundHolding.setCouponRate(Double.valueOf(getCouponRate(node)));
+		fundHolding.setCouponType(getCouponType(node));
+		fundHolding.setCouponFrequency(getCouponFrequency(node));
+		fundHolding.setFirstCouponDate(getFirstCouponDate(node));
+		fundHolding.setMaturityDate(getMaturityDate(node));
+		fundHolding.setSettlementDate(getSettlementDate(node));
+		fundHolding.setMoodyRating(getMoodyRating(node));
+		fundHolding.setCallable(getCallable(node));
+		fundHolding.setPuttable(getPuttable(node));
+		fundHolding.setEdiIssuerName(getEdiIssuerName(node));
+		fundHolding.setEdiIssuerId(getEdiIssuerId(node));
+		fundHolding.setModifiedDuration(getModifiedDuration(node));
+		fundHolding.setYieldToMaturity(getYieldToMaturity(node));
+		fundHolding.setPrimaryExchange(getPrimaryExchange(node));
+		fundHolding.setAccruedInterest(Double.valueOf(getAccruedInterest(node)));
+		fundHolding.setYieldToCall(Double.valueOf(getYieldToCall(node)));
+		fundHolding.setYieldToPut(Double.valueOf(getYieldToPut(node)));
+		fundHolding.setEffectiveDuration(Double.valueOf(getEffectiveDuration(node)));
+		fundHolding.setMacaulayDuration(Double.valueOf(getMacaulayDuration(node)));
+		fundHolding.setConvexity(Double.valueOf(getConvexity(node)));
+		fundHolding.setNominalValue(Double.valueOf(getNominalValue(node)));
+		fundHolding.setIssueDate(getIssueDate(node));
+		fundHolding.setOutstandingAmount(Double.valueOf(getOutstandingAmount(node)));
+		fundHolding.setInterestAccrualConvention(getInterestAccrualConvention(node));
+		fundHolding.setInterestCommencementDate(getInterestCommencementDate(node));
+		fundHolding.setFloatingRateNoteIndexBenchmark(getFloatingRateNoteIndexBenchmark(node));
+		fundHolding.setPerpetual(getPerpetual(node));
+		fundHolding.setMaturityPriceAsAPercent(getMaturityPriceAsAPercent(node));
+		fundHolding.setMaturityStructure(getMaturityStructure(node));
 		
 		return fundHolding;
 	}
@@ -181,6 +213,26 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	}
 	
 	@SneakyThrows
+	private String getCic(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./CIC");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getSecurityName(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./SecurityName");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
 	private String getLocalCurrencyCode(Node node) {
 		
 		log.debug("Entering");
@@ -191,7 +243,335 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		return StringUtils.isBlank(localCurrencyCode) ? "N/A" : localCurrencyCode;
 	}
+	
+	@SneakyThrows
+	private String getLocalMarketValue(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./LocalMarketValue");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getCouponRate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./Coupon");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getCouponType(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./CouponType");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getCouponFrequency(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./CouponFrequency");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getFirstCouponDate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./FirstCouponDate");
+		
+		return expr.evaluate(node);
+	}
+	
+	
+	@SneakyThrows
+	private String getMaturityDate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./MaturityDate");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getMoodyRating(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./MoodyRating");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
+	private String getCallable(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./Callable");
+		
+		String callable = expr.evaluate(node);
+		
+		return StringUtils.isBlank(callable) ? "N/A" : callable;
+	}
+	
+	@SneakyThrows
+	private String getPuttable(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./Puttable");
+		
+		String puttable = expr.evaluate(node);
+		
+		return StringUtils.isBlank(puttable) ? "N/A" : puttable;
+	}
+	
+	
+	
+	@SneakyThrows
+	private String getEdiIssuerName(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./EDIIssuerName");
+		
+		return expr.evaluate(node);
 
+	}
+	
+	@SneakyThrows
+	private String getEdiIssuerId(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./EDIIssuerName/@_Id");
+		
+		return expr.evaluate(node);
+
+	}
+	
+	@SneakyThrows
+	private String getModifiedDuration(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./ModifiedDuration");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getYieldToMaturity(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./YieldtoMaturity");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getSettlementDate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./SettlementDate");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getPrimaryExchange(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./PrimaryExchange");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getAccruedInterest(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./AccruedInterest");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getYieldToCall(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./YieldtoCall");
+		
+		return expr.evaluate(node);
+		
+	}
+
+	@SneakyThrows
+	private String getYieldToPut(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./YieldtoPut");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getEffectiveDuration(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./EffectiveDuration");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getMacaulayDuration(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./MacaulayDuration");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getConvexity(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./Convexity");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getNominalValue(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./NominalValue");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getIssueDate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./IssueDate");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getInterestAccrualConvention(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./InterestAccrualConvention");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getOutstandingAmount(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./OutstandingAmount");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getInterestCommencementDate(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./IntCommencementDate");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getFloatingRateNoteIndexBenchmark(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./FrnIndexBenchmark");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getPerpetual(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./Perpetual");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getMaturityPriceAsAPercent(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./MatPriceAsPercent");
+		
+		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getMaturityStructure(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./MaturityStructure");
+		
+		return expr.evaluate(node);
+		
+	}
+	
 	private SortedMap<Integer, FundHolding> adjust(final SortedMap<Integer, FundHolding> fundHoldings) {
 		
 		log.debug("Entering");

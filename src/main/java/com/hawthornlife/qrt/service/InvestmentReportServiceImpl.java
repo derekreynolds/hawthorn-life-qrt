@@ -35,7 +35,7 @@ import lombok.SneakyThrows;
  * @author Derek Reynolds
  *
  */
-public class InvestmentReportServiceImpl implements InvestmentReportService {
+public class InvestmentReportServiceImpl implements ReportService {
 
 	private static Logger log = LoggerFactory.getLogger(InvestmentReportServiceImpl.class);
 	

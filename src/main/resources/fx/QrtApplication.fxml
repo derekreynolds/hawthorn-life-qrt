@@ -31,9 +31,14 @@
         </Menu>
             <Menu mnemonicParsing="false" text="Generate">
               <items>
-                <MenuItem mnemonicParsing="false" onAction="#onClickGenerateReport" text="Investment Report">
+                <MenuItem mnemonicParsing="false" onAction="#onClickGenerateInvestmentReport" text="Investment Report">
                      <accelerator>
-                        <KeyCodeCombination alt="UP" code="G" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                        <KeyCodeCombination alt="UP" code="I" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
+                     </accelerator>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#onClickGenerateActuarialReport" text="Actuarial Report">
+                     <accelerator>
+                        <KeyCodeCombination alt="UP" code="A" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
                   </MenuItem>
               </items>

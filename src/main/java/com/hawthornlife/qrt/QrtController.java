@@ -29,7 +29,7 @@ import com.hawthornlife.qrt.service.FundHoldingService;
 import com.hawthornlife.qrt.service.FundHoldingServiceImpl;
 import com.hawthornlife.qrt.service.FundService;
 import com.hawthornlife.qrt.service.FundServiceImpl;
-import com.hawthornlife.qrt.service.InvestmentReportService;
+import com.hawthornlife.qrt.service.ReportService;
 import com.hawthornlife.qrt.service.InvestmentReportServiceImpl;
 
 import javafx.scene.control.Label;
@@ -123,6 +123,8 @@ public class QrtController {
 			alert.setTitle("Hawthorn Life QRT");
 			alert.setHeaderText("Report Error");
 			alert.setContentText(ex.getMessage());
+			
+			log.error("Error", ex);
 
 			alert.showAndWait();
 		}
@@ -150,7 +152,7 @@ public class QrtController {
 	 * @param event
 	 */
 	@FXML
-	public void onClickGenerateReport(final ActionEvent event) {
+	public void onClickGenerateInvestmentReport(final ActionEvent event) {
 		
 		log.debug("Entering");
 		
@@ -184,7 +186,7 @@ public class QrtController {
 				watch.split();
 				log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
 			
-				InvestmentReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
+				ReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
 				
 				InvestmentReportService.generate();
 				
@@ -216,6 +218,99 @@ public class QrtController {
 				alert.setTitle("Hawthorn Life QRT");
 				alert.setHeaderText("Report Generated Successfully");
 				alert.setContentText("Hawthorn Life QRT successfully generated.");
+	
+				alert.showAndWait();
+				
+			} else {
+				
+				Alert alert = new Alert(Alert.AlertType.ERROR);
+				
+				alert.setTitle("Hawthorn Life QRT");
+				alert.setHeaderText("Report Generation Error");
+				alert.setContentText("An error occured while generating the QRT report. Please consult log files.");
+
+				alert.showAndWait();
+			}
+			
+		});
+		
+		
+	}
+
+	
+	/**
+	 * Generates the Investment report based on the funds read from the XML.
+	 * The report will only contain funds with an AUM greater than zero.
+	 * 
+	 * @param event
+	 */
+	@FXML
+	public void onClickGenerateActuarialReport(final ActionEvent event) {
+		
+		log.debug("Entering");
+		
+		log.info("Generating Investment Report");
+		
+		mainGrid.requestFocus();
+		
+		ProgressDialog<String> progressDialog = new ProgressDialog<>(main.getScene().getWindow(), "Generating Acturial Report");
+				 
+		progressDialog.exec("Calculating", inputParam -> {
+		       
+			StopWatch watch = StopWatch.createStarted();
+			
+			ExecutorService executor = Executors.newWorkStealingPool();
+
+			List<Callable<Boolean>> callables = new ArrayList<>();
+			
+			FundHoldingService fundHoldingService = new FundHoldingServiceImpl();
+						
+			this.funds.values().stream()
+				.filter(f -> f.getAssetUnderManagement() > 0.0)
+				.forEach(f -> callables.add(new FundHoldingCallable(fundHoldingService, f)));
+			
+			try {
+						
+				for(Future<Boolean> result: executor.invokeAll(callables)) {
+					if(!result.get())
+						return new Integer(0);
+				}
+				
+				watch.split();
+				log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
+			
+				ReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
+				
+				InvestmentReportService.generate();
+				
+				watch.stop();
+				
+				log.info("Time taken to generate report: {}", watch.getTime());
+				
+			} catch (InterruptedException | ExecutionException e) {
+				log.error("Error reading the fund holdings.", e);
+				return new Integer(0);
+			} catch(Exception e) {
+				log.error("Unexpected exception.", e);
+				return new Integer(0);
+			} finally {
+				log.debug("Shutting down executor.");
+				executor.shutdown();
+			}
+			
+			
+		    return new Integer(1);
+		});
+		
+		progressDialog.addTaskEndNotification(value -> {
+			
+			if(value == 1) {
+				
+				Alert alert = new Alert(Alert.AlertType.INFORMATION);
+				
+				alert.setTitle("Hawthorn Life Actuarial Report");
+				alert.setHeaderText("Actuarial Report Generated Successfully");
+				alert.setContentText("Hawthorn Life Actuarial Report generated.");
 	
 				alert.showAndWait();
 				

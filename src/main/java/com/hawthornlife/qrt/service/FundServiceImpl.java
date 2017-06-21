@@ -75,10 +75,19 @@ public class FundServiceImpl implements FundService {
 		fund.setDocument(document);
 		fund.setName(getName(document));
 		fund.setLegalName(getLegalName(document));
+		fund.setValuationDate(getValuationDate(document));
+		fund.setPortfolioName(getPortfolioName(document));
+		fund.setPortfolioCurrency(getPortfolioCurrency(document));
 		fund.setIsin(getIsin(document));
 		fund.setCountry(getDomicile(document));
 		fund.setCountryCode(getDomicileCode(document));
-				
+		fund.setFundCustodianCountry(getFundCustodianCountry(document));
+		fund.setFundIssuerGroupName(getFundIssuerGroupName(document));
+		fund.setFundIssuerCountry(getFundIssuerCountry(document));
+		fund.setShareClassCic(getShareClassCic(document));
+		fund.setDuration(Double.valueOf(getDuration(document)));
+		fund.setLatestNetAssetValutation(Double.valueOf(getLatestNetAssetValuation(document)));
+					
 		return fund;
 	}	
 	
@@ -97,6 +106,33 @@ public class FundServiceImpl implements FundService {
 		log.debug("Entering");
 				
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundBasics/LegalName");
+		
+		return expr.evaluate(document);
+	}
+	
+	private String getValuationDate(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/PortfolioList/Portfolio/PortfolioSummary/Date");
+		
+		return expr.evaluate(document);
+	}
+	
+	private String getPortfolioName(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr = xpath.compile("/FundShareClass/Operation/ShareClassBasics/LegalName");
+		
+		return expr.evaluate(document);
+	}
+	
+	private String getPortfolioCurrency(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr = xpath.compile("/FundShareClass/Operation/ShareClassBasics/Currency");
 		
 		return expr.evaluate(document);
 	}
@@ -132,6 +168,72 @@ public class FundServiceImpl implements FundService {
 		
 		return StringUtils.isBlank(countryCode) ? "N/A" : countryCode;
 	}	
+	
+	private String getFundCustodianCountry(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/CustodianList/CustodianCompany/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country[@_Id]");
+		
+		String countryCode = expr.evaluate(document);
+		
+		return StringUtils.isBlank(countryCode) ? "N/A" : countryCode;
+	}	
+	
+	private String getFundIssuerGroupName(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/UmbrellaCompany/Company/CompanyOperation/CompanyBasics/Name");
+		
+		String fundIssuerGroupName = expr.evaluate(document);
+		
+		return StringUtils.isBlank(fundIssuerGroupName) ? "N/A" : fundIssuerGroupName;
+	}	
+	
+	private String getFundIssuerCountry(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/Registration/CountryOfRegistration/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country[@_id]");
+		
+		String countryCode = expr.evaluate(document);
+		
+		return StringUtils.isBlank(countryCode) ? "N/A" : countryCode;
+	}
+	
+	private String getShareClassCic(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/ProprietaryData/CIC/ShareClassCIC");
+		
+		String shareClassCic = expr.evaluate(document);
+		
+		return StringUtils.isBlank(shareClassCic) ? "N/A" : shareClassCic;
+	}
+	
+	private String getDuration(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/PortfolioList/Portfolio/PortfolioStatistics/BondStatistics/EffectiveDuration");
+		
+		String duration = expr.evaluate(document);
+		
+		return StringUtils.isBlank(duration) ? "0.0" : duration;
+	}
+	
+	private String getLatestNetAssetValuation(Document document) throws XPathExpressionException {
+		
+		log.debug("Entering");
+			
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/HistoricalOperation/LatestNetAsset/Value");
+		
+		String duration = expr.evaluate(document);
+		
+		return StringUtils.isBlank(duration) ? "0.0" : duration;
+	}
 	
 	
 }
