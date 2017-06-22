@@ -24,6 +24,7 @@ import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.util.FundAumObservable;
 import com.hawthornlife.qrt.util.FxUtil;
 import com.hawthornlife.qrt.util.TotalAumObserver;
+import com.hawthornlife.qrt.service.ActuarialReportServiceImpl;
 import com.hawthornlife.qrt.service.FundHoldingCallable;
 import com.hawthornlife.qrt.service.FundHoldingService;
 import com.hawthornlife.qrt.service.FundHoldingServiceImpl;
@@ -279,7 +280,7 @@ public class QrtController {
 				watch.split();
 				log.info("Time taken to read fund holdings: {}", watch.getSplitTime());
 			
-				ReportService InvestmentReportService = new InvestmentReportServiceImpl(this.funds);
+				ReportService InvestmentReportService = new ActuarialReportServiceImpl(this.funds);
 				
 				InvestmentReportService.generate();
 				

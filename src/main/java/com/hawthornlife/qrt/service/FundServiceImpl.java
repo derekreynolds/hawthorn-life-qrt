@@ -173,7 +173,7 @@ public class FundServiceImpl implements FundService {
 		
 		log.debug("Entering");
 			
-		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/CustodianList/CustodianCompany/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country[@_Id]");
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/CustodianList/CustodianCompany/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country/@_Id");
 		
 		String countryCode = expr.evaluate(document);
 		
@@ -195,7 +195,7 @@ public class FundServiceImpl implements FundService {
 		
 		log.debug("Entering");
 			
-		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/Registration/CountryOfRegistration/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country[@_id]");
+		XPathExpression expr = xpath.compile("/FundShareClass/Fund/FundManagement/Registration/CountryOfRegistration/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country/@_Id");
 		
 		String countryCode = expr.evaluate(document);
 		

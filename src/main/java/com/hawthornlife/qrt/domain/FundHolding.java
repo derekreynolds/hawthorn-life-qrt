@@ -24,6 +24,8 @@ public @Data class FundHolding {
 		
 	private String assetClass;
 	
+	private String isin;
+	
 	private Double marketValue = 0.0;
 	
 	private Double localMarketValue = 0.0;
@@ -93,5 +95,7 @@ public @Data class FundHolding {
 	private Double weighting = 0.0;
 	
 	private Double adjustedWeighting = 0.0;
+	
+	private String uac;
 
 }

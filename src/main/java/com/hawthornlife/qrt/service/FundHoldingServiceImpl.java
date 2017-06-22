@@ -85,6 +85,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		fundHolding.setCountryCode(getCountryCode(node));
 		fundHolding.setCic(getCic(node));
 		fundHolding.setSecurityName(getSecurityName(node));
+		fundHolding.setIsin(getIsin(node));
 		fundHolding.setMarketValue(Double.valueOf(getMarketValue(node)));
 		fundHolding.setWeighting(Double.valueOf(getWeighting(node)));
 		// Adjust the weighting: negative if market value is negative
@@ -124,6 +125,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		fundHolding.setPerpetual(getPerpetual(node));
 		fundHolding.setMaturityPriceAsAPercent(getMaturityPriceAsAPercent(node));
 		fundHolding.setMaturityStructure(getMaturityStructure(node));
+		fundHolding.setUac(getUac(node));
 		
 		return fundHolding;
 	}
@@ -233,6 +235,16 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	}
 	
 	@SneakyThrows
+	private String getIsin(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr =  xpath.compile("./ISIN");
+		
+		return expr.evaluate(node);
+	}
+	
+	@SneakyThrows
 	private String getLocalCurrencyCode(Node node) {
 		
 		log.debug("Entering");
@@ -249,9 +261,11 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering");
 		
-		XPathExpression expr =  xpath.compile("./LocalMarketValue");
+		XPathExpression expr = xpath.compile("./LocalMarketValue");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 	}
 	
 	@SneakyThrows
@@ -261,7 +275,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./Coupon");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 	}
 	
 	@SneakyThrows
@@ -414,7 +430,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./AccruedInterest");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -425,7 +443,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./YieldtoCall");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 
@@ -436,7 +456,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./YieldtoPut");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -447,7 +469,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./EffectiveDuration");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -458,7 +482,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./MacaulayDuration");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -469,7 +495,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./Convexity");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -480,7 +508,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./NominalValue");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -513,7 +543,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./OutstandingAmount");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -535,7 +567,9 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr =  xpath.compile("./FrnIndexBenchmark");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -544,9 +578,11 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering");
 		
-		XPathExpression expr =  xpath.compile("./Perpetual");
+		XPathExpression expr = xpath.compile("./Perpetual");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -555,9 +591,11 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering");
 		
-		XPathExpression expr =  xpath.compile("./MatPriceAsPercent");
+		XPathExpression expr = xpath.compile("./MatPriceAsPercent");
 		
-		return expr.evaluate(node);
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "0.0" : value;
 		
 	}
 	
@@ -566,9 +604,22 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering");
 		
-		XPathExpression expr =  xpath.compile("./MaturityStructure");
+		XPathExpression expr = xpath.compile("./MaturityStructure");
 		
 		return expr.evaluate(node);
+		
+	}
+	
+	@SneakyThrows
+	private String getUac(Node node) {
+		
+		log.debug("Entering");
+		
+		XPathExpression expr = xpath.compile("./UAC");
+		
+		String value = expr.evaluate(node);
+		
+		return StringUtils.isBlank(value) ? "N/A" : value;
 		
 	}
 	
