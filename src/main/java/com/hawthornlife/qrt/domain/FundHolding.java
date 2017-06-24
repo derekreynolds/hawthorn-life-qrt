@@ -28,6 +28,8 @@ public @Data class FundHolding {
 	
 	private Double marketValue = 0.0;
 	
+	private String quotationCurrencyCode;
+	
 	private Double localMarketValue = 0.0;
 	
 	private Double couponRate = 0.0;

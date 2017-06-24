@@ -82,6 +82,9 @@ public class ActuarialReportServiceImpl implements ReportService {
 	private void createWorksheets() {
 	
 		for(Fund fund: funds.values()) {
+			
+			if(fund.getAssetUnderManagement() <= 0.0)
+				continue;
 		
 			XSSFSheet spreadsheet = workbook.createSheet(fund.getIsin());
 			
@@ -180,7 +183,7 @@ public class ActuarialReportServiceImpl implements ReportService {
 		row.createCell(columnIndex++).setCellValue(fundHolding.getIsin());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getCic());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getSecurityName());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getLocalCurrencyCode());
+		row.createCell(columnIndex++).setCellValue(fundHolding.getQuotationCurrencyCode());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getLocalMarketValue());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getMarketValue());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getCouponRate());
