@@ -7,8 +7,6 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Map;
 import java.util.SortedMap;
 
 import org.apache.poi.ss.usermodel.CellType;
@@ -27,6 +25,8 @@ import com.hawthornlife.qrt.domain.FundHolding;
 import lombok.SneakyThrows;
 
 /**
+ * This service produces the Actuarial Report.
+ * 
  * @author Derek Reynolds
  *
  */
@@ -79,6 +79,9 @@ public class ActuarialReportServiceImpl implements ReportService {
 
 	}
 	
+	/*
+	 * This method controls the creation of the worksheets.
+	 */
 	private void createWorksheets() {
 	
 		for(Fund fund: funds.values()) {
@@ -99,6 +102,10 @@ public class ActuarialReportServiceImpl implements ReportService {
 	
 	}
 	
+	/**
+	 * Adds the headers to the spreadsheet.
+	 * @param spreadsheet
+	 */
 	private void addFundHoldingHeaders(XSSFSheet spreadsheet) {
 		
 		log.debug("Entering");
@@ -160,6 +167,13 @@ public class ActuarialReportServiceImpl implements ReportService {
 		
 	}
 	
+	/**
+	 * Adds each fund holding to the spreadsheet.
+	 * @param rowIndex 
+	 * @param spreadsheet
+	 * @param fund
+	 * @param fundHolding
+	 */
 	private void addFundHoldingRow(int rowIndex, final XSSFSheet spreadsheet, final Fund fund, final FundHolding fundHolding) {
 		
 		log.debug("Entering with row {}, Fund {}", rowIndex, fund.getLegalName());
