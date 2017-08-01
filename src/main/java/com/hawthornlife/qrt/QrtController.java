@@ -254,7 +254,7 @@ public class QrtController {
 		
 		mainGrid.requestFocus();
 		
-		ProgressDialog<String> progressDialog = new ProgressDialog<>(main.getScene().getWindow(), "Generating Acturial Report");
+		ProgressDialog<String> progressDialog = new ProgressDialog<>(main.getScene().getWindow(), "Generating Actuarial Report");
 				 
 		progressDialog.exec("Calculating", inputParam -> {
 		       

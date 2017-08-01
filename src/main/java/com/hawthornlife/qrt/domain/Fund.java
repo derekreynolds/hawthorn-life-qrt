@@ -39,12 +39,6 @@ public @Data class Fund {
 	
 	private String country;
 	
-	private String fundCustodianCountry;
-	
-	private String fundIssuerGroupName;
-	
-	private String fundIssuerCountry;
-	
 	private String shareClassCic;
 	
 	private Double assetUnderManagement = 0.0;

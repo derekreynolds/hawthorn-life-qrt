@@ -72,9 +72,6 @@ public class FundServiceImpl implements FundService {
 		fund.setIsin(xPathUtil.getValue(document, "/FundShareClass/Operation/ShareClassBasics/ISIN", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setCountry(xPathUtil.getValue(document, "/FundShareClass/Fund/FundBasics/Domicile", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setCountryCode(xPathUtil.getValue(document, "/FundShareClass/Fund/FundBasics/Domicile/@_Id", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fund.setFundCustodianCountry(xPathUtil.getValue(document, "/FundShareClass/Fund/FundManagement/CustodianList/CustodianCompany/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country/@_Id", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fund.setFundIssuerGroupName(xPathUtil.getValue(document, "/FundShareClass/Fund/FundManagement/UmbrellaCompany/Company/CompanyOperation/CompanyBasics/Name", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fund.setFundIssuerCountry(xPathUtil.getValue(document, "/FundShareClass/Fund/FundManagement/Registration/CountryOfRegistration/Company/Headquarter/CountryHeadquarter[@PrimaryHeadquarter=\"true\"]/Country/@_Id", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setShareClassCic(xPathUtil.getValue(document, "/FundShareClass/ProprietaryData/CIC/ShareClassCIC", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setDuration(Double.valueOf(xPathUtil.getValue(document, "/FundShareClass/Fund/PortfolioList/Portfolio/PortfolioStatistics/BondStatistics/EffectiveDuration", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
 		fund.setLatestNetAssetValutation(Double.valueOf(xPathUtil.getValue(document, "/FundShareClass/Fund/HistoricalOperation/LatestNetAsset/Value", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));

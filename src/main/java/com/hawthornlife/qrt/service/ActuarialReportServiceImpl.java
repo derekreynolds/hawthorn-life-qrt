@@ -4,7 +4,10 @@
 package com.hawthornlife.qrt.service;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.text.MessageFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.SortedMap;
@@ -21,6 +24,7 @@ import org.slf4j.LoggerFactory;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.domain.FundHolding;
+import com.hawthornlife.qrt.util.PoiUtil;
 
 import lombok.SneakyThrows;
 
@@ -34,19 +38,30 @@ public class ActuarialReportServiceImpl implements ReportService {
 
 	private static Logger log = LoggerFactory.getLogger(ActuarialReportServiceImpl.class);
 	
-	private final XSSFWorkbook workbook = new XSSFWorkbook();
+	private final XSSFWorkbook workbook;
 	
 	private final SortedMap<String, Fund> funds;
 		
 	private XSSFCellStyle decimalStyle;
 	
+	private XSSFCellStyle dateStyle;
 	
+	@SneakyThrows
 	public ActuarialReportServiceImpl(SortedMap<String, Fund> funds) {
 		
 		this.funds = funds;
 		
-		decimalStyle=(XSSFCellStyle) workbook.createCellStyle();
+		
+		InputStream file = getClass().getClassLoader().getResourceAsStream("template/AssetCalculationsActuarialSCRV1.0Template.xlsx");
+
+
+		workbook = new XSSFWorkbook(file);
+		
+		decimalStyle = (XSSFCellStyle) workbook.createCellStyle();
 		decimalStyle.setDataFormat(workbook.createDataFormat().getFormat("#0.000000"));
+		
+		dateStyle = (XSSFCellStyle) workbook.createCellStyle();
+		dateStyle.setDataFormat(workbook.createDataFormat().getFormat("YYYY-MM-DD"));
 	
 	}
 	
@@ -118,53 +133,59 @@ public class ActuarialReportServiceImpl implements ReportService {
 		row.createCell(columnIndex++).setCellValue("Portfolio name");
 		row.createCell(columnIndex++).setCellValue("Portfolio currency(B)");
 		row.createCell(columnIndex++).setCellValue("Net asset valuation of the portfolio in Portfolio currency");
-		row.createCell(columnIndex++).setCellValue("Duration");
-		row.createCell(columnIndex++).setCellValue("Fund custodian country");
-		row.createCell(columnIndex++).setCellValue("Fund issuer group name");
-		row.createCell(columnIndex++).setCellValue("Fund issuer country");		
+		row.createCell(columnIndex++).setCellValue("Duration");		
 		row.createCell(columnIndex++).setCellValue("Fund CIC code");
-		
-		row.createCell(columnIndex++).setCellValue("Valuation weight");
 		row.createCell(columnIndex++).setCellValue("Identification code of the instrument");
 		row.createCell(columnIndex++).setCellValue("CIC code of the instrument");
 		row.createCell(columnIndex++).setCellValue("Instrument name");
-		row.createCell(columnIndex++).setCellValue("Quotation currency (A)");
-		row.createCell(columnIndex++).setCellValue("Market valuation in quotation currency(A)");		
+		row.createCell(columnIndex++).setCellValue("Quotation currency (A)");		
 		row.createCell(columnIndex++).setCellValue("Market valuation in portfolio currency(B)");
-		row.createCell(columnIndex++).setCellValue("Coupon rate");
-		row.createCell(columnIndex++).setCellValue("Maturity date");
 		row.createCell(columnIndex++).setCellValue("Credit rating");
-		row.createCell(columnIndex++).setCellValue("Underlying asset category");
 		row.createCell(columnIndex++).setCellValue("Coupon type");
 		row.createCell(columnIndex++).setCellValue("Coupon frequency");
-		row.createCell(columnIndex++).setCellValue("Callable");
-		row.createCell(columnIndex++).setCellValue("Putable");
-		row.createCell(columnIndex++).setCellValue("EDI issuer name");
-		row.createCell(columnIndex++).setCellValue("EDI issuer id");
 		row.createCell(columnIndex++).setCellValue("Modified duration");
 		row.createCell(columnIndex++).setCellValue("Yield to maturity");
 		row.createCell(columnIndex++).setCellValue("Maturity date");
 		row.createCell(columnIndex++).setCellValue("Settlement date");
-		row.createCell(columnIndex++).setCellValue("Primary exchange");
-		row.createCell(columnIndex++).setCellValue("Accrued interest");
-		row.createCell(columnIndex++).setCellValue("Yield To call");
-		row.createCell(columnIndex++).setCellValue("Yield To put");
-		row.createCell(columnIndex++).setCellValue("Effective duration");
-		row.createCell(columnIndex++).setCellValue("Macaulay duration");
-		row.createCell(columnIndex++).setCellValue("Convexity");
-		row.createCell(columnIndex++).setCellValue("First coupon date");
 		row.createCell(columnIndex++).setCellValue("Coupon rate");
 		row.createCell(columnIndex++).setCellValue("Nominal value");
-		row.createCell(columnIndex++).setCellValue("Issue date");
-		row.createCell(columnIndex++).setCellValue("Outstanding amount");
-		row.createCell(columnIndex++).setCellValue("Interest commencement date");
 		row.createCell(columnIndex++).setCellValue("Interest accrual convention");
 		row.createCell(columnIndex++).setCellValue("Floating rate note index benchmark");
-		row.createCell(columnIndex++).setCellValue("Perpetual");
-		row.createCell(columnIndex++).setCellValue("Maturity price as a percent");
-		row.createCell(columnIndex++).setCellValue("Maturity structure");
-
 		
+		row.createCell(columnIndex++).setCellValue("Reassign codes");
+		row.createCell(columnIndex++).setCellValue("Country in OECD/EEA");
+		row.createCell(columnIndex++).setCellValue("Equity");
+		row.createCell(columnIndex++).setCellValue("Property");
+		row.createCell(columnIndex++).setCellValue("Cash");
+		row.createCell(columnIndex++).setCellValue("Interest");
+		row.createCell(columnIndex++).setCellValue("Spread");
+		row.createCell(columnIndex++).setCellValue("Base asset value");
+		row.createCell(columnIndex++).setCellValue("Equity stress factor");
+		row.createCell(columnIndex++).setCellValue("Asset value after equity stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after property stress");
+		row.createCell(columnIndex++).setCellValue("Currency");
+		row.createCell(columnIndex++).setCellValue("Maturity date");
+		row.createCell(columnIndex++).setCellValue("Nominal");
+		row.createCell(columnIndex++).setCellValue("Floating rate");	
+		row.createCell(columnIndex++).setCellValue("Base bond rate");
+		row.createCell(columnIndex++).setCellValue("IR up bond rate");
+		row.createCell(columnIndex++).setCellValue("IR down bond rate");
+		row.createCell(columnIndex++).setCellValue("IR up stress");
+		row.createCell(columnIndex++).setCellValue("IR down stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after IR up stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after IR down stress");
+		row.createCell(columnIndex++).setCellValue("Yield");
+		row.createCell(columnIndex++).setCellValue("Modified duration");
+		row.createCell(columnIndex++).setCellValue("Maturity cohort");
+		row.createCell(columnIndex++).setCellValue("Credit quality step");
+		row.createCell(columnIndex++).setCellValue("Parameter 1");
+		row.createCell(columnIndex++).setCellValue("Parameter 2");
+		row.createCell(columnIndex++).setCellValue("Parameter 3");
+		row.createCell(columnIndex++).setCellValue("Spread risk stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after spread stress");
+		
+		for(int i = 0; i < columnIndex; i++)
+			spreadsheet.autoSizeColumn(i);
 	}
 	
 	/**
@@ -182,75 +203,65 @@ public class ActuarialReportServiceImpl implements ReportService {
 		 
 		int columnIndex = 0;
 		
-		row.createCell(columnIndex++).setCellValue(fund.getValuationDate());
-		row.createCell(columnIndex++).setCellValue(fund.getPortfolioName());
-		row.createCell(columnIndex++).setCellValue(fund.getPortfolioCurrency());		
-		row.createCell(columnIndex++).setCellValue(fund.getLatestNetAssetValutation());		
-		row.createCell(columnIndex++).setCellValue(fund.getDuration());		
-		row.createCell(columnIndex++).setCellValue(fund.getFundCustodianCountry());
-		row.createCell(columnIndex++).setCellValue(fund.getFundIssuerGroupName());
-		row.createCell(columnIndex++).setCellValue(fund.getFundIssuerCountry());
-		row.createCell(columnIndex++).setCellValue(fund.getShareClassCic());
+		PoiUtil.createPossibleCell(row, columnIndex++, fund.getValuationDate());
+		PoiUtil.createPossibleCell(row, columnIndex++, fund.getPortfolioName());
+		PoiUtil.createPossibleCell(row, columnIndex++, fund.getPortfolioCurrency());		
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fund.getLatestNetAssetValutation());		
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fund.getDuration());		
+		PoiUtil.createPossibleCell(row, columnIndex++, fund.getShareClassCic());		
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getIsin());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getCic());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getSecurityName());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getQuotationCurrencyCode());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getMarketValue());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getMoodyRating());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getCouponType());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getCouponFrequency());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getModifiedDuration());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getYieldToMaturity());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getMaturityDate());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getSettlementDate());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getCouponRate());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getNominalValue());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getInterestAccrualConvention());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getFloatingRateNoteIndexBenchmark());
 		
+		int rowReferenceIndex = rowIndex + 1;
 		
-		row.createCell(columnIndex++).setCellValue(fundHolding.getWeighting());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getIsin());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCic());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getSecurityName());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getQuotationCurrencyCode());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getLocalMarketValue());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMarketValue());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCouponRate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMaturityDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMoodyRating());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getUac());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCouponType());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCouponFrequency());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCallable());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getPuttable());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getEdiIssuerName());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getEdiIssuerId());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getModifiedDuration());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getYieldToMaturity());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMaturityDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getSettlementDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getPrimaryExchange());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getAccruedInterest());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getYieldToCall());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getYieldToPut());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getEffectiveDuration());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMacaulayDuration());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getConvexity());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getFirstCouponDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getCouponRate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getNominalValue());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getIssueDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getOutstandingAmount());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getInterestCommencementDate());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getInterestAccrualConvention());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getFloatingRateNoteIndexBenchmark());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getPerpetual());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMaturityPriceAsAPercent());
-		row.createCell(columnIndex++).setCellValue(fundHolding.getMaturityStructure());
-
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(LEN($H${0})<4,\"ZZ\"&$H${0},$H${0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("VLOOKUP(LEFT($W{0},2),Parameters!$C$1:$F$1048576,4,0)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"Equity\", IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,6,0)=1,\"Equity\",\"No Equity\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Property\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,7,0)=1,\"Property\",\"No Property\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Cash\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,4,0)=1,\"Cash\",\"No Cash\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Interest\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,5,0)=1,\"Interest\",\"No Interest\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Spread\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,8,0)=1,\"Spread\",\"No Spread\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$K${0}", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($Y${0}=\"Equity\",IF($X${0}=\"Yes\",OthEqu_T1_Stress-Sym_Adj,OthEqu_T2_Stress-Sym_Adj),0)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AE${0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($Z${0}=\"Property\",$AD${0}*(1+Property_Stress),$AD${0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISNA(HLOOKUP($J${0},'FinalSpotRates'!$B$2:$AI$2,1,0)),\"GBP\",HLOOKUP($J${0},'FinalSpotRates'!$B$2:$AI$2,1,0))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("MAX(IF($Q${0}=\"\",IF($AA${0}=\"Cash\",Parameters!$C$2+1,Parameters!$C$3),VALUE($Q${0})),Parameters!$C$2+1)", rowReferenceIndex)).setCellStyle(dateStyle);
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($T${0}=0,100,$T${0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISNA(VLOOKUP($V${0},Parameters!$H$38:$I$60,2,0)),0,VLOOKUP($V${0},Parameters!$H$38:$I$60,2,0))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(OR($AB${0}=\"Interest\",$AC${0}=\"Spread\"),CALCBONDVALUE($AJ${0},$S${0}/100,$AK${0},$AI${0},IF($R${0}=\"\",Parameters!$C$2,$R${0}),OFFSET(FinalSpotRates!$A$3:$A$73,0,MATCH($AH${0},FinalSpotRates!$B$2:$AI$2,0))),0)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(OR($AB${0}=\"Interest\",$AC${0}=\"Spread\"),CALCBONDVALUE($AJ${0},$S${0}/100,$AK${0},$AI${0},IF($R${0}=\"\",Parameters!$C$2,$R${0}),OFFSET(FinalSpotRates!$AJ$3:$AJ$73,0,MATCH($AH${0},FinalSpotRates!$AK$2:$BR$2,0))),0)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(OR($AB${0}=\"Interest\",$AC${0}=\"Spread\"),CALCBONDVALUE($AJ${0},$S${0}/100,$AK${0},$AI${0},IF($R${0}=\"\",Parameters!$C$2,$R${0}),OFFSET(FinalSpotRates!$BS$3:$BS$73,0,MATCH($AH${0},FinalSpotRates!$BT$2:$DA$2,0))),0)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AL${0}=0,0,$AM${0}/$AL${0}-1)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AL${0}=0,0,$AN${0}/$AL${0}-1)", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AL${0}*(1+$AO{0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AL${0}*(1+$AP{0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",YIELD(IF($R${0}=\"\",Parameters!$C$2,$R${0}),$AI${0},$S${0}/100,$AD${0}*100/$AJ${0},100,IF($N${0}=\"Semi-Annual\",2,IF($N${0}=\"Quarterly\",4,1)),1),\"\")", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",IF($O${0}=\"\",MDURATION(IF($R${0}=\"\",Parameters!$C$2,AD2),$AI${0},$S${0}/100,MAX($AS${0},0),IF($N${0}=\"Semi-Annual\",2,1),1)/(1+$AS${0}),VALUE($O${0})),\"\")", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AU${0}<5,5,IF($AU${0}>=20,999,IF(AND($AU${0}<10,$AU${0}>=5),10,IF(AND($AU${0}<15,$AU${0}>=10),15,IF(AND($AU${0}<20,$AU${0}>=15),20)))))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",IF(ISERROR(VLOOKUP($L${0},Parameters!$I$6:$J$28,2,0)),\"unrated\",VLOOKUP($L${0},Parameters!$I$6:$J$28,2,0)),\"\")", rowReferenceIndex));		
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$5:$T$11,MATCH($AU${0},Parameters!$L$7:$L$11,0)+2,MATCH($AV${0},Parameters!$M$5:$T$5,0)+1)),\"\",INDEX(Parameters!$L$5:$T$11,MATCH($AU${0},Parameters!$L$7:$L$11,0)+2,MATCH($AV${0},Parameters!$M$5:$T$5,0)+1))", rowReferenceIndex));																				
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$12:$T$18,MATCH($AU${0},Parameters!$L$14:$L$18,0)+2,MATCH($AV${0},Parameters!$M$12:$T$12,0)+1)),\"\",INDEX(Parameters!$L$12:$T$18,MATCH($AU${0},Parameters!$L$14:$L$18,0)+2,MATCH($AV${0},Parameters!$M$12:$T$12,0)+1))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$19:$T$25,MATCH($AU${0},Parameters!$L$21:$L$25,0)+2,MATCH($AV${0},Parameters!$M$19:$T$19,0)+1)),\"\",INDEX(Parameters!$L$19:$T$25,MATCH($AU${0},Parameters!$L$21:$L$25,0)+2,MATCH($AV${0},Parameters!$M$19:$T$19,0)+1))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AW${0}=\"\",0,-($AW${0}+$AX${0}*($AU${0}-$AZ${0})))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AZ${0})", rowReferenceIndex));
+		
 	}
 	
-	private void createPossibleCell(final XSSFRow row, Integer columnIndex, String value) {
-		
-		if("N/A".equalsIgnoreCase(value)) {
-			row.createCell(columnIndex++).setCellType(CellType.BLANK);
-		} else {
-			row.createCell(columnIndex++).setCellValue(value);
-		}
-	}
-	
-	private void createNumberCell(final XSSFRow row, Integer columnIndex, Double value) {		
-		
-		XSSFCell cell = row.createCell(columnIndex, CellType.NUMERIC);
-		cell.setCellStyle(decimalStyle);
-		cell.setCellValue(value);		
-		
-	}
 
 
 }

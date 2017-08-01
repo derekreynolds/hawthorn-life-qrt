@@ -128,42 +128,23 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 				? fundHolding.getWeighting() 
 				: fundHolding.getWeighting() * -1) / 100);
 		fundHolding.setAssetClass(xPathUtil.getValue(node, "./UAC", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setCouponRate(Double.valueOf(xPathUtil.getValue(node, "./Coupon", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
 		fundHolding.setCouponType(xPathUtil.getValue(node, "./CouponType", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setCouponFrequency(xPathUtil.getValue(node, "./CouponFrequency", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setFirstCouponDate(xPathUtil.getValue(node, "./FirstCouponDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setMaturityDate(xPathUtil.getValue(node, "./MaturityDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
+		fundHolding.setCouponRate(Double.valueOf(xPathUtil.getValue(node, "./Coupon", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
 		fundHolding.setSettlementDate(xPathUtil.getValue(node, "./SettlementDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE)); 
 		fundHolding.setMoodyRating(xPathUtil.getValue(node, "./MoodyRating", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setCallable(xPathUtil.getValue(node, "./Callable", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setPuttable(xPathUtil.getValue(node, "./Puttable", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setEdiIssuerName(xPathUtil.getValue(node, "./EDIIssuerName", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setEdiIssuerId(xPathUtil.getValue(node, "./EDIIssuerName/@_Id", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setModifiedDuration(xPathUtil.getValue(node, "./ModifiedDuration", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setYieldToMaturity(xPathUtil.getValue(node, "./YieldtoMaturity", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setPrimaryExchange(xPathUtil.getValue(node, "./PrimaryExchange", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setAccruedInterest(Double.valueOf(xPathUtil.getValue(node, "./AccruedInterest", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setYieldToCall(Double.valueOf(xPathUtil.getValue(node, "./YieldtoCall", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setYieldToPut(Double.valueOf(xPathUtil.getValue(node, "./YieldtoPut", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setEffectiveDuration(Double.valueOf(xPathUtil.getValue(node, "./EffectiveDuration", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setMacaulayDuration(Double.valueOf(xPathUtil.getValue(node, "./MacaulayDuration", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setConvexity(Double.valueOf(xPathUtil.getValue(node, "./Convexity", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
+		fundHolding.setMaturityDate(xPathUtil.getValue(node, "./MaturityDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setNominalValue(Double.valueOf(xPathUtil.getValue(node, "./NominalValue", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
-		fundHolding.setIssueDate(xPathUtil.getValue(node, "./IssueDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setOutstandingAmount(Double.valueOf(xPathUtil.getValue(node, "./OutstandingAmount", XPathUtil.EMPTY_DOUBLE_DEFAULT_VALUE)));
 		fundHolding.setInterestAccrualConvention(xPathUtil.getValue(node, "./InterestAccrualConvention", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setInterestCommencementDate(xPathUtil.getValue(node, "./IntCommencementDate", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setFloatingRateNoteIndexBenchmark(xPathUtil.getValue(node, "./FrnIndexBenchmark", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setPerpetual(xPathUtil.getValue(node, "./Perpetual", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setMaturityPriceAsAPercent(xPathUtil.getValue(node, "./MatPriceAsPercent", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-		fundHolding.setMaturityStructure(xPathUtil.getValue(node, "./MaturityStructure", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fundHolding.setUac(xPathUtil.getValue(node, "./UAC", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		
 		Optional<Node> portfolioNode = getPortfolioHoldingDetailNode(fund, fundHolding.getName());
 		
 		if(portfolioNode.isPresent()) {
 			fundHolding.setQuotationCurrencyCode(xPathUtil.getValue(portfolioNode.get(), "./LocalCurrencyCode", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
-			fundHolding.setLocalMarketValue(Double.valueOf(xPathUtil.getValue(portfolioNode.get(), "./LocalMarketValue", XPathUtil.EMPTY_STRING_DEFAULT_VALUE)));	
 		}
 		
 		
