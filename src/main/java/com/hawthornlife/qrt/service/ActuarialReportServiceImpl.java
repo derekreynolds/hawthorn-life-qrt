@@ -49,11 +49,9 @@ public class ActuarialReportServiceImpl implements ReportService {
 	@SneakyThrows
 	public ActuarialReportServiceImpl(SortedMap<String, Fund> funds) {
 		
-		this.funds = funds;
-		
+		this.funds = funds;	
 		
 		InputStream file = getClass().getClassLoader().getResourceAsStream("template/AssetCalculationsActuarialSCRV1.0Template.xlsx");
-
 
 		workbook = new XSSFWorkbook(file);
 		
@@ -99,6 +97,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 	 */
 	private void createWorksheets() {
 	
+		int fundCount = 0;
+		
 		for(Fund fund: funds.values()) {
 			
 			if(fund.getAssetUnderManagement() <= 0.0)
@@ -113,6 +113,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 			for(FundHolding fundHolding: fund.getFundHoldings().values()) {
 				addFundHoldingRow(index++, spreadsheet, fund, fundHolding);			
 			}
+			
+			addToSummary(fund, fundCount++);
 		}
 	
 	}
@@ -183,6 +185,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 		row.createCell(columnIndex++).setCellValue("Parameter 3");
 		row.createCell(columnIndex++).setCellValue("Spread risk stress");
 		row.createCell(columnIndex++).setCellValue("Asset value after spread stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after FX up stress");
+		row.createCell(columnIndex++).setCellValue("Asset value after FX down stress");
 		
 		for(int i = 0; i < columnIndex; i++)
 			spreadsheet.autoSizeColumn(i);
@@ -232,7 +236,7 @@ public class ActuarialReportServiceImpl implements ReportService {
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("VLOOKUP(LEFT($W{0},2),Parameters!$C$1:$F$1048576,4,0)", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"Equity\", IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,6,0)=1,\"Equity\",\"No Equity\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Property\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,7,0)=1,\"Property\",\"No Property\"))", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Cash\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,4,0)=1,\"Cash\",\"No Cash\"))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Cash\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,4,0)=\"Cash\",\"Cash\",\"No Cash\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Interest\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,5,0)=1,\"Interest\",\"No Interest\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Spread\",IF(VLOOKUP(RIGHT($H${0},2),'CICCodes'!$D$3:$M$113,8,0)=1,\"Spread\",\"No Spread\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$K${0}", rowReferenceIndex));
@@ -248,20 +252,49 @@ public class ActuarialReportServiceImpl implements ReportService {
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(OR($AB${0}=\"Interest\",$AC${0}=\"Spread\"),CALCBONDVALUE($AJ${0},$S${0}/100,$AK${0},$AI${0},IF($R${0}=\"\",Parameters!$C$2,$R${0}),OFFSET(FinalSpotRates!$BS$3:$BS$73,0,MATCH($AH${0},FinalSpotRates!$BT$2:$DA$2,0))),0)", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AL${0}=0,0,$AM${0}/$AL${0}-1)", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AL${0}=0,0,$AN${0}/$AL${0}-1)", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AL${0}*(1+$AO{0})", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AL${0}*(1+$AP{0})", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",YIELD(IF($R${0}=\"\",Parameters!$C$2,$R${0}),$AI${0},$S${0}/100,$AD${0}*100/$AJ${0},100,IF($N${0}=\"Semi-Annual\",2,IF($N${0}=\"Quarterly\",4,1)),1),\"\")", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AO{0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AP{0})", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",YIELD(IF($R${0}=\"\",Parameters!$C$2,$R${0}),$AI${0},$S${0}/100,$AL${0}*100/$AJ${0},100,IF($N${0}=\"Semi-Annual\",2,IF($N${0}=\"Quarterly\",4,1)),1),\"\")", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",IF($O${0}=\"\",MDURATION(IF($R${0}=\"\",Parameters!$C$2,AD2),$AI${0},$S${0}/100,MAX($AS${0},0),IF($N${0}=\"Semi-Annual\",2,1),1)/(1+$AS${0}),VALUE($O${0})),\"\")", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AU${0}<5,5,IF($AU${0}>=20,999,IF(AND($AU${0}<10,$AU${0}>=5),10,IF(AND($AU${0}<15,$AU${0}>=10),15,IF(AND($AU${0}<20,$AU${0}>=15),20)))))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AT${0}<5,5,IF($AT${0}>=20,999,IF(AND($AT${0}<10,$AT${0}>=5),10,IF(AND($AT${0}<15,$AT${0}>=10),15,IF(AND($AT${0}<20,$AT${0}>=15),20)))))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AC${0}=\"Spread\",IF(ISERROR(VLOOKUP($L${0},Parameters!$I$6:$J$28,2,0)),\"unrated\",VLOOKUP($L${0},Parameters!$I$6:$J$28,2,0)),\"\")", rowReferenceIndex));		
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$5:$T$11,MATCH($AU${0},Parameters!$L$7:$L$11,0)+2,MATCH($AV${0},Parameters!$M$5:$T$5,0)+1)),\"\",INDEX(Parameters!$L$5:$T$11,MATCH($AU${0},Parameters!$L$7:$L$11,0)+2,MATCH($AV${0},Parameters!$M$5:$T$5,0)+1))", rowReferenceIndex));																				
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$12:$T$18,MATCH($AU${0},Parameters!$L$14:$L$18,0)+2,MATCH($AV${0},Parameters!$M$12:$T$12,0)+1)),\"\",INDEX(Parameters!$L$12:$T$18,MATCH($AU${0},Parameters!$L$14:$L$18,0)+2,MATCH($AV${0},Parameters!$M$12:$T$12,0)+1))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(ISERROR(INDEX(Parameters!$L$19:$T$25,MATCH($AU${0},Parameters!$L$21:$L$25,0)+2,MATCH($AV${0},Parameters!$M$19:$T$19,0)+1)),\"\",INDEX(Parameters!$L$19:$T$25,MATCH($AU${0},Parameters!$L$21:$L$25,0)+2,MATCH($AV${0},Parameters!$M$19:$T$19,0)+1))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($AW${0}=\"\",0,-($AW${0}+$AX${0}*($AU${0}-$AZ${0})))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AZ${0})", rowReferenceIndex));
-		
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($J${0}=\"GBP\",$AD${0},$AD${0}*(1+FX_Up))", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($J${0}=\"GBP\",$AD${0},$AD${0}*(1+FX_Down))", rowReferenceIndex));
+				
 	}
 	
-
+	private void addToSummary(final Fund fund, int fundIndex) {
+		
+		int columnIndex = fundIndex + 1;
+		int rowIndex = 1;
+		
+		XSSFSheet summary = this.workbook.getSheet("Summary");
+		
+		XSSFRow row = summary.getRow(rowIndex++);
+		
+		row.createCell(columnIndex).setCellValue(fund.getIsin());
+		
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$AD$1:$AD$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$AF$1:$AF$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$AG$1:$AG$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$AQ$1:$AQ$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$AR$1:$AR$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$BA$1:$BA$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$BB$1:$BB$1048576)", fund.getIsin()));
+		row = summary.getRow(rowIndex++);
+		PoiUtil.createFormualCell(row, columnIndex, MessageFormat.format("SUM({0}!$BC$1:$BC$1048576)", fund.getIsin()));
+	}
 
 }
