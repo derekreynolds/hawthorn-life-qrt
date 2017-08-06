@@ -170,12 +170,10 @@ public class QrtController {
 			ExecutorService executor = Executors.newWorkStealingPool();
 
 			List<Callable<Boolean>> callables = new ArrayList<>();
-			
-			FundHoldingService fundHoldingService = new FundHoldingServiceImpl();
 						
 			this.funds.values().stream()
 				.filter(f -> f.getAssetUnderManagement() > 0.0)
-				.forEach(f -> callables.add(new FundHoldingCallable(fundHoldingService, f)));
+				.forEach(f -> callables.add(new FundHoldingCallable(f)));
 			
 			try {
 						
@@ -263,12 +261,10 @@ public class QrtController {
 			ExecutorService executor = Executors.newWorkStealingPool();
 
 			List<Callable<Boolean>> callables = new ArrayList<>();
-			
-			FundHoldingService fundHoldingService = new FundHoldingServiceImpl();
-						
+									
 			this.funds.values().stream()
 				.filter(f -> f.getAssetUnderManagement() > 0.0)
-				.forEach(f -> callables.add(new FundHoldingCallable(fundHoldingService, f)));
+				.forEach(f -> callables.add(new FundHoldingCallable(f)));
 			
 			try {
 						

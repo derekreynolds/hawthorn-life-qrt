@@ -22,13 +22,10 @@ public class FundHoldingCallable implements Callable<Boolean> {
 
 	private static Logger log = LoggerFactory.getLogger(FundHoldingCallable.class);
 	
-	private final FundHoldingService fundHoldingService;
-
 	private final Fund fund;
 	
 	
-	public FundHoldingCallable(final FundHoldingService fundHoldingService, final Fund fund) {
-		this.fundHoldingService = fundHoldingService;
+	public FundHoldingCallable(final Fund fund) {
 		this.fund = fund;
 	}
 	
@@ -40,6 +37,8 @@ public class FundHoldingCallable implements Callable<Boolean> {
 		log.info("Getting fund holdings for {}", fund.getLegalName());
 		
 		try {
+		
+			FundHoldingService fundHoldingService = new FundHoldingServiceImpl();
 			
 			StopWatch watch = StopWatch.createStarted();
 			
