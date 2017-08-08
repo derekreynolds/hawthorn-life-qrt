@@ -83,7 +83,7 @@ public class ActuarialReportServiceImpl implements ReportService {
 		
 		FileUtils.forceMkdir(new File(text));
 		
-		File reportFile = new File(text + "/Hawthorn-Life-Actuarial-Report.xlsx");
+		File reportFile = new File(text + "/Hawthorn-Life-Actuarial-Report.xlsm");
 		
 		FileOutputStream out = new FileOutputStream(reportFile);
 		

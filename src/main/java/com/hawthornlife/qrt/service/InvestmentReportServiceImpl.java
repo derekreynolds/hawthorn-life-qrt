@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -26,6 +24,7 @@ import org.codehaus.plexus.util.FileUtils;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.domain.FundHolding;
+import com.hawthornlife.qrt.util.PoiUtil;
 
 import lombok.SneakyThrows;
 
@@ -115,7 +114,7 @@ public class InvestmentReportServiceImpl implements ReportService {
 			 
 			dataRow.createCell(columnIndex++).setCellValue(fund.getIsin());
 			dataRow.createCell(columnIndex++).setCellValue(fund.getLegalName());			
-			this.createNumberCell(dataRow, columnIndex++, fund.getAssetUnderManagement());
+			PoiUtil.createNumberCell(dataRow, columnIndex++, decimalStyle, fund.getAssetUnderManagement());
 			
 			createFundHoldingSheet(fund);	
 			createAssetClassSheet(fund);
@@ -173,15 +172,15 @@ public class InvestmentReportServiceImpl implements ReportService {
 			XSSFRow row = spreadsheet.createRow(++rowIndex);
 						
 			for(String keyPart: key.split(":")) {
-				createPossibleCell(row, columnIndex++, keyPart);				
+				PoiUtil.createPossibleCell(row, columnIndex++, keyPart);				
 			}
 			
 			double summedAdjustedWeight = assetClassAggregation.get(key)
 					.stream()
 					.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
 			
-			createNumberCell(row, columnIndex++, summedAdjustedWeight);
-			createNumberCell(row, columnIndex++, summedAdjustedWeight * fund.getAssetUnderManagement());
+			PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, summedAdjustedWeight);
+			PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, summedAdjustedWeight * fund.getAssetUnderManagement());
 		}
 		
 		return assetClassAggregation.keySet().size();
@@ -238,34 +237,19 @@ public class InvestmentReportServiceImpl implements ReportService {
 		row.createCell(columnIndex++).setCellValue(fundHolding.getExternalId());
 		row.createCell(columnIndex++).setCellValue(fundHolding.getName());
 		
-		createPossibleCell(row, columnIndex++, fundHolding.getCountry());
-		createPossibleCell(row, columnIndex++, fundHolding.getCountryCode());
-		createPossibleCell(row, columnIndex++, fundHolding.getLocalCurrencyCode());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getCountry());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getCountryCode());
+		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getLocalCurrencyCode());
 						
 		row.createCell(columnIndex++).setCellValue(fundHolding.getAssetClass());
-		createNumberCell(row, columnIndex++, fundHolding.getMarketValue());
-		createNumberCell(row, columnIndex++, fundHolding.getWeighting());
-		createNumberCell(row, columnIndex++, fundHolding.getAdjustedWeighting());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getMarketValue());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getWeighting());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fundHolding.getAdjustedWeighting());
 		
-		createNumberCell(row, columnIndex++, fund.getAssetUnderManagement() * fundHolding.getAdjustedWeighting());
+		PoiUtil.createNumberCell(row, columnIndex++, decimalStyle, fund.getAssetUnderManagement() * fundHolding.getAdjustedWeighting());
 	}
 	
-	private void createPossibleCell(final XSSFRow row, Integer columnIndex, String value) {
-		
-		if("N/A".equalsIgnoreCase(value)) {
-			row.createCell(columnIndex++).setCellType(CellType.BLANK);
-		} else {
-			row.createCell(columnIndex++).setCellValue(value);
-		}
-	}
 	
-	private void createNumberCell(final XSSFRow row, Integer columnIndex, Double value) {		
-		
-		XSSFCell cell = row.createCell(columnIndex, CellType.NUMERIC);
-		cell.setCellStyle(decimalStyle);
-		cell.setCellValue(value);		
-		
-	}
 	
 	private Map<String, List<FundHolding>> groupByAssetClass(Fund fund) {
 		
