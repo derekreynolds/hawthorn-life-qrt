@@ -235,8 +235,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getInterestAccrualConvention());
 		PoiUtil.createPossibleCell(row, columnIndex++, fundHolding.getFloatingRateNoteIndexBenchmark());
 		
-		int rowReferenceIndex = rowIndex + 1;
-		
+		String rowReferenceIndex = Long.toString(rowIndex + 1);
+
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF(LEN($H${0})<4,\"ZZ\"&$H${0},$H${0})", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("VLOOKUP(LEFT($W{0},2),Parameters!$C$1:$F$1048576,4,0)", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"Equity\", IF(VLOOKUP(RIGHT($H${0},2),'CIC_Codes'!$D$3:$M$113,6,0)=1,\"Equity\",\"No Equity\"))", rowReferenceIndex));

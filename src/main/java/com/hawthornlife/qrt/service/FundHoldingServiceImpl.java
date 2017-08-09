@@ -14,6 +14,8 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
+import org.apache.commons.lang3.StringEscapeUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -84,7 +86,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		if(portfolioHoldingNode == null)
 			portfolioHoldingNode = getPortfolioHoldingNode(fund);
 		
-		XPathExpression expr = xpath.compile("./HoldingDetail[@ExternalName=\""+ externalName + "\"]");
+		XPathExpression expr = xpath.compile("./HoldingDetail[@ExternalName=\""+ StringEscapeUtils.escapeXml11(externalName) + "\"]");
 		
 		NodeList holdings = (NodeList)expr.evaluate(portfolioHoldingNode, XPathConstants.NODESET);		
 		
