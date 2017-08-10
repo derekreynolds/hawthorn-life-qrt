@@ -117,7 +117,7 @@ public class QrtController {
 			
 			log.debug("Time taken to read XML files: {}", watch.getTime());
 			
-		} catch(Exception ex) {
+		} catch(Throwable ex) {
 			
 			Alert alert = new Alert(Alert.AlertType.ERROR);
 			
@@ -196,7 +196,7 @@ public class QrtController {
 			} catch (InterruptedException | ExecutionException e) {
 				log.error("Error reading the fund holdings.", e);
 				return new Integer(0);
-			} catch(Exception e) {
+			} catch(Throwable e) {
 				log.error("Unexpected exception.", e);
 				return new Integer(0);
 			} finally {
@@ -248,7 +248,7 @@ public class QrtController {
 		
 		log.debug("Entering");
 		
-		log.info("Generating Investment Report");
+		log.info("Generating Actuarial Report");
 		
 		mainGrid.requestFocus();
 		
@@ -287,7 +287,7 @@ public class QrtController {
 			} catch (InterruptedException | ExecutionException e) {
 				log.error("Error reading the fund holdings.", e);
 				return new Integer(0);
-			} catch(Exception e) {
+			} catch(Throwable e) {
 				log.error("Unexpected exception.", e);
 				return new Integer(0);
 			} finally {

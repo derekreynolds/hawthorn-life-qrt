@@ -48,7 +48,7 @@ public class FundHoldingCallable implements Callable<Boolean> {
 			
 			log.info("Time taken to get fund holdings: {} for {}", watch.getTime() , fund.getLegalName());
 			
-		} catch (Exception ex) {
+		} catch (Throwable ex) {
 			log.error("Error getting fund holdings", ex);
 			return false;
 		}
