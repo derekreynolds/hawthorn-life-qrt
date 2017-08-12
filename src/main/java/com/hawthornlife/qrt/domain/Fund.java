@@ -4,10 +4,9 @@
 package com.hawthornlife.qrt.domain;
 
 
+import java.io.File;
 import java.util.SortedMap;
 import java.util.TreeMap;
-
-import org.w3c.dom.Document;
 
 import lombok.Data;
 
@@ -21,7 +20,7 @@ import lombok.Data;
 
 public @Data class Fund {
 
-	private Document document;
+	private File file;
 	
 	private String name;
 	

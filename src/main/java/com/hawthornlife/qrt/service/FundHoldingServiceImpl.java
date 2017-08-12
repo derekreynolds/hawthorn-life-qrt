@@ -15,16 +15,17 @@ import javax.xml.xpath.XPathExpression;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.lang3.StringEscapeUtils;
-import org.apache.commons.lang3.StringUtils;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.domain.FundHolding;
 import com.hawthornlife.qrt.util.XPathUtil;
+import com.hawthornlife.qrt.util.XmlUtil;
 
 import lombok.SneakyThrows;
 
@@ -42,6 +43,8 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	
 	private XPathUtil xPathUtil = new XPathUtil();
 	
+	private Document document;
+	
 	private Node portfolioHoldingNode;
 	
 	
@@ -54,7 +57,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	public SortedMap<Integer, FundHolding> getFundHoldings(final Fund fund) {
 		
 		log.debug("Entering with {} - {}", fund.getLegalName(), fund.getIsin());
-		
+				
 		return adjust(createFundHoldings(fund));
 	}
 
@@ -62,13 +65,15 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 	@SneakyThrows
 	private SortedMap<Integer, FundHolding> createFundHoldings(Fund fund) {
 		
-		log.debug("Entering");
+		log.debug("Entering");		
+
+		document = XmlUtil.getDocument(fund.getFile());
 		
 		SortedMap<Integer, FundHolding> fundHoldings = new TreeMap<>();		
 		
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/PortfolioList/Portfolio/AggregatedHolding/HoldingDetail");
 	
-		NodeList holdings = (NodeList)expr.evaluate(fund.getDocument(), XPathConstants.NODESET);
+		NodeList holdings = (NodeList)expr.evaluate(document, XPathConstants.NODESET);
 		
 		for(int i = 0; i < holdings.getLength(); i++) {
 			FundHolding fundHolding = getFundHolding(fund, holdings.item(i).cloneNode(true));			
@@ -101,7 +106,7 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		XPathExpression expr = xpath.compile("/FundShareClass/Fund/PortfolioList/Portfolio/Holding");
 		
-		return (Node) expr.evaluate(fund.getDocument(), XPathConstants.NODE);		
+		return (Node) expr.evaluate(document, XPathConstants.NODE);		
 				
 	}
 	

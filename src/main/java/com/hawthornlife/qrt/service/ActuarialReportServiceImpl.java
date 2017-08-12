@@ -118,6 +118,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 			}
 			
 			addFundToSummary(fund, fundCount++);
+			
+			fund.getFundHoldings().clear();
 		}
 		
 		addTotalToSummary(funds.size());

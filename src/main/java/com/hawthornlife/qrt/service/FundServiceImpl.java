@@ -5,8 +5,6 @@ package com.hawthornlife.qrt.service;
 
 import java.io.File;
 import java.io.IOException;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.XPathExpressionException;
 
@@ -17,6 +15,7 @@ import org.xml.sax.SAXException;
 
 import com.hawthornlife.qrt.domain.Fund;
 import com.hawthornlife.qrt.util.XPathUtil;
+import com.hawthornlife.qrt.util.XmlUtil;
 
 
 /**
@@ -37,16 +36,9 @@ public class FundServiceImpl implements FundService {
 		
 		log.debug("Entering with {}", file.getAbsoluteFile());
 		
-		DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-		DocumentBuilder dBuilder;
-		
-		try {
+		try {			
 			
-			dBuilder = dbFactory.newDocumentBuilder();
-		
-			Document document = dBuilder.parse(file);
-			
-			return createFund(document);
+			return createFund(file);
 			
 		} catch (ParserConfigurationException | SAXException | XPathExpressionException | IOException e) {
 			log.error("Error reading file {}", file.getAbsoluteFile());
@@ -57,13 +49,15 @@ public class FundServiceImpl implements FundService {
 	}
 
 	/* (non-Javadoc)
-	 * @see com.hawthornlife.qrt.service.FileService#createFund(org.w3c.dom.Document)
+	 * @see com.hawthornlife.qrt.service.FileService#createFund(java.io.File)
 	 */
-	private Fund createFund(Document document) throws XPathExpressionException {
+	private Fund createFund(File file) throws XPathExpressionException, ParserConfigurationException, SAXException, IOException {
+		
+		Document document = XmlUtil.getDocument(file);
 		
 		Fund fund = new Fund();
-		
-		fund.setDocument(document);
+				
+		fund.setFile(file);
 		fund.setName(xPathUtil.getValue(document, "/FundShareClass/Fund/FundBasics/Name", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setLegalName(xPathUtil.getValue(document, "/FundShareClass/Fund/FundBasics/LegalName", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
 		fund.setValuationDate(xPathUtil.getValue(document, "/FundShareClass/Fund/PortfolioList/Portfolio/PortfolioSummary/Date", XPathUtil.EMPTY_STRING_DEFAULT_VALUE));
