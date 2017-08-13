@@ -118,7 +118,9 @@ public class InvestmentReportServiceImpl implements ReportService {
 			
 			createFundHoldingSheet(fund);	
 			createAssetClassSheet(fund);
-			combinedSheetRowIndex += createCombinedAssetClassSheet(combinedSpreadsheet, fund, combinedSheetRowIndex);			
+			combinedSheetRowIndex += createCombinedAssetClassSheet(combinedSpreadsheet, fund, combinedSheetRowIndex);	
+			
+			fund.getFundHoldings().clear();
 		 }		
 		
 		workbook.setSheetOrder("Combined Asset Class", workbook.getNumberOfSheets() - 1);
