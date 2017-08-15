@@ -1,6 +1,9 @@
 # Hawthorn Life QRT
 
-SII Investment Report
+SII Investment & Actuarial Report
+
+## Runtime
+Java 8
 
 ## Run Application
 java -jar qrt-0.0.1-SNAPSHOT-jar-with-dependencies.jar
