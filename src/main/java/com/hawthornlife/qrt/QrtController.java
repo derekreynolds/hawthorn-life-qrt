@@ -26,8 +26,6 @@ import com.hawthornlife.qrt.util.FxUtil;
 import com.hawthornlife.qrt.util.TotalAumObserver;
 import com.hawthornlife.qrt.service.ActuarialReportServiceImpl;
 import com.hawthornlife.qrt.service.FundHoldingCallable;
-import com.hawthornlife.qrt.service.FundHoldingService;
-import com.hawthornlife.qrt.service.FundHoldingServiceImpl;
 import com.hawthornlife.qrt.service.FundService;
 import com.hawthornlife.qrt.service.FundServiceImpl;
 import com.hawthornlife.qrt.service.ReportService;

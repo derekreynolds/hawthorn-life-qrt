@@ -40,11 +40,11 @@ public @Data class Fund {
 	
 	private String shareClassCic;
 	
-	private Double assetUnderManagement = 0.0;
+	private double assetUnderManagement = 0.0;
 	
-	private Double duration = 0.0;
+	private double duration = 0.0;
 	
-	private Double latestNetAssetValutation = 0.0;
+	private double latestNetAssetValutation = 0.0;
 
 	private SortedMap<Integer, FundHolding> fundHoldings = new TreeMap<>();
 	

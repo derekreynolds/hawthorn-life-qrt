@@ -26,13 +26,17 @@ public class QrtApplication extends Application {
 	
     public static void main( String[] args )  {
 		
-		log.info("Launching application");
+		log.info("Launching application");		
 		
     	Application.launch(args);
     }
     
     @Override
     public void start(Stage stage) throws Exception {
+    	
+		if(log.isDebugEnabled()) {
+			getPlatformInfo();
+		}
     	
     	Parent root = FXMLLoader.load(getClass().getClassLoader().getResource("fx/QrtApplication.fxml"));
     	
@@ -51,5 +55,12 @@ public class QrtApplication extends Application {
     	stage.show();
     }
     
-   
+   private void getPlatformInfo() {
+	   
+	   log.debug("Number of processors: {}", Runtime.getRuntime().availableProcessors());
+	   log.debug("Free memory: {}", Runtime.getRuntime().freeMemory());
+	   log.debug("Total memory: {}", Runtime.getRuntime().totalMemory());
+	   
+   }
+    
 }

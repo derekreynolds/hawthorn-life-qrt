@@ -47,7 +47,7 @@ public class TotalAumObserver implements Observer {
 		
 		log.debug("Entering");
 		
-		Double totalAumValue = funds.stream().mapToDouble(f -> f.getAssetUnderManagement()).sum();		
+		Double totalAumValue = funds.stream().mapToDouble(f -> {log.debug("{}, {} ", f.getName(), f.getAssetUnderManagement()); return f.getAssetUnderManagement();}).sum();		
 		
 		log.info("New total AUM is {}", formatter.format(totalAumValue));
 		

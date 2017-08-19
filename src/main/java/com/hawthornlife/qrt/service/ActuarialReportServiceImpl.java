@@ -39,6 +39,8 @@ public class ActuarialReportServiceImpl implements ReportService {
 	private final XSSFWorkbook workbook;
 	
 	private final SortedMap<String, Fund> funds;
+	
+	private Double totalPortfolioValue = 0.0;
 		
 	private XSSFCellStyle decimalStyle;
 	
@@ -106,6 +108,13 @@ public class ActuarialReportServiceImpl implements ReportService {
 			
 			if(fund.getAssetUnderManagement() <= 0.0)
 				continue;
+			
+			totalPortfolioValue = fund.getFundHoldings()
+					.values()
+					.stream()
+					.mapToDouble((FundHolding fh) -> fh.getMarketValue())
+					.sum();			
+					
 		
 			XSSFSheet spreadsheet = workbook.createSheet(fund.getIsin());
 			
@@ -246,7 +255,7 @@ public class ActuarialReportServiceImpl implements ReportService {
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Cash\",IF(VLOOKUP(RIGHT($H${0},2),'CIC_Codes'!$D$3:$M$113,4,0)=\"Cash\",\"Cash\",\"No Cash\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Interest\",IF(VLOOKUP(RIGHT($H${0},2),'CIC_Codes'!$D$3:$M$113,5,0)=1,\"Interest\",\"No Interest\"))", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($H${0}=\"\",\"No Spread\",IF(VLOOKUP(RIGHT($H${0},2),'CIC_Codes'!$D$3:$M$113,8,0)=1,\"Spread\",\"No Spread\"))", rowReferenceIndex));
-		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$K${0}", rowReferenceIndex));
+		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$K${0} * {1, number, ##########.############}", rowReferenceIndex, fund.getAssetUnderManagement() / totalPortfolioValue));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($Y${0}=\"Equity\",IF($X${0}=\"Yes\",OthEqu_T1_Stress-Sym_Adj,OthEqu_T2_Stress-Sym_Adj),0)", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("$AD${0}*(1+$AE${0})", rowReferenceIndex));
 		PoiUtil.createFormualCell(row, columnIndex++, MessageFormat.format("IF($Z${0}=\"Property\",$AD${0}*(1+Property_Stress),$AD${0})", rowReferenceIndex));

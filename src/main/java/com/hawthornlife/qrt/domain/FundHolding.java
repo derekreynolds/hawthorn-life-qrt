@@ -26,7 +26,7 @@ public @Data class FundHolding {
 	
 	private String isin;
 	
-	private Double marketValue = 0.0;
+	private double marketValue = 0.0;
 	
 	private String quotationCurrencyCode;
 	
@@ -40,7 +40,7 @@ public @Data class FundHolding {
 	
 	private String couponFrequency;
 	
-	private Double couponRate = 0.0;
+	private double couponRate = 0.0;
 		
 	private String modifiedDuration;
 	
@@ -50,15 +50,15 @@ public @Data class FundHolding {
 		
 	private String settlementDate;
 	
-	private Double nominalValue = 0.0;
+	private double nominalValue = 0.0;
 		
 	private String interestAccrualConvention;
 	
 	private String floatingRateNoteIndexBenchmark;
 		
-	private Double weighting = 0.0;
+	private double weighting = 0.0;
 	
-	private Double adjustedWeighting = 0.0;
+	private double adjustedWeighting = 0.0;
 	
 	private String uac;
 
