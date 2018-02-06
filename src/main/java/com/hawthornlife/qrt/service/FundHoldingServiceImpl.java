@@ -164,6 +164,12 @@ public class FundHoldingServiceImpl implements FundHoldingService {
 		
 		log.debug("Entering");
 		
+		if(fundHoldings.isEmpty()) {
+			log.info("No fund holdings found");
+			return fundHoldings;
+		}
+			
+		
 		double totalValue = fundHoldings.values()
 				.stream()
 				.mapToDouble(fh -> fh.getAdjustedWeighting()).sum();
